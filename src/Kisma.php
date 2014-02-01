@@ -18,6 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
+namespace Kisma;
+
 use Kisma\Core\Interfaces\KismaSettings;
 use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Utility\Detector;

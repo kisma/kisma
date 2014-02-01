@@ -1,6 +1,6 @@
 {
 	"name":        "kisma/kisma",
-	"description": "PHP Utility Belt",
+	"description": "PHP Utility Kernel",
 	"keywords":    [
 		"php", "php5", "library", "utility"
 	],
@@ -20,7 +20,7 @@
 		"php": ">=5.3.18"
 	},
 	"require-dev": {
-		"phpunit/phpunit":              "~3.7.30@stable",
+		"phpunit/phpunit":              "@stable",
 		"phpunit/phpunit-mock-objects": "@stable",
 		"phpunit/phpunit-selenium":     "@stable",
 		"phpunit/phpunit-story":        "@stable",
@@ -32,8 +32,8 @@
 		"phpunit/php-invoker":          "@stable"
 	},
 	"autoload":    {
-		"psr-0": {
-			"Kisma": "src/"
+		"psr-4": {
+			"Kisma\\": "src/"
 		},
 		"files": ["src/autoload.php"]
 	}
