@@ -3,10 +3,7 @@
 # Kisma&trade;: PHP Utility Kernel v0.3.x-dev
 Thanks for checking out *Kisma*!
 
-<a href="http://www.jetbrains.com/phpstorm/" style="display:block;alt="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers" title="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers">
-<span style="margin: 3px 0 0 65px;padding: 0;float: left;font-size: 12px;cursor:pointer;  background-image:none;border:0;color: #fff; font-family: trebuchet ms,arial,sans-serif;font-weight: normal;text-align:left;">Proudly developed with</span><br/>
-![](http://www.jetbrains.com/phpstorm/documentation/phpstorm_banners/phpstorm1/phpstorm468x60_violet.gif)
-</a>
+<a href="http://www.jetbrains.com/phpstorm/" style="display:block; background:#fff url(http://www.jetbrains.com/phpstorm/documentation/phpstorm_banners/phpstorm1/phpstorm468x60_white.gif) no-repeat 10px 50%; border:solid 1px #5854b5; margin:0;padding:0;text-decoration:none;text-indent:0;letter-spacing:-0.001em; width:466px; height:58px" alt="Lightning-smart IDE for PHP development" title="Lightning-smart IDE for PHP development"><span style="margin: 3px 0 0 65px;padding: 0;float: left;font-size: 12px;cursor:pointer;  background-image:none;border:0;color: #5854b5; font-family: trebuchet ms,arial,sans-serif;font-weight: normal;text-align:left;">Developed with</span><span style="margin:0 0 0 185px;padding:18px 0 2px 0; line-height:13px;font-size:13px;cursor:pointer;  background-image:none;border:0;display:block; width:270px; color:#5854b5; font-family: trebuchet ms,arial,sans-serif;font-weight: normal;text-align:left;">Lightning-smart IDE for PHP<br/>development</span></a>
 
 # About the name...
 Besides being a town in the Rift Valley of Kenya, "kisma" is the [Quechuan](http://en.wikipedia.org/wiki/Quechua_people) word for "womb". Since all living things are birthed
@@ -44,9 +41,9 @@ I will be working on more documentation when I flesh out my model more.
 
 # Features
 
-* Easy to use/grasp/grok/work with
+* Easy to use and lightweight
 * Quicker to code repetitive tasks
-* All setters return ```$this``` for easy chaining
+* All setters return `$this` for easy chaining
 * Easy to configure
 * PSR-* compliant
 * Packagist/Composer-compatible!
@@ -78,5 +75,5 @@ Because Kisma&trade; is PSR-0 compliant, you can also just clone the repo and us
 A [PHP Archive](http://php.net/manual/en/book.phar.php) (or .phar) file is not yet available.
 
 # Requirements
+
 * PHP v5.3+
- Kisma&trade; requires PHP v5.3+.
