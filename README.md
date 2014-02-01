@@ -57,7 +57,8 @@ I will be working on more documentation when I flesh out my model more.
 
 <blockquote cite="https://getcomposer.org/doc/00-intro.md">
 Composer is a tool for dependency management in PHP. It allows you to declare the dependent libraries your project needs and it will install them in your project for you.
-<small class="author">Composer Website</small>
+<br/>
+<div style="display: inline-block; font-size: 75%; color: #999999"><small><em>-- Composer Website</em></small></div>
 </blockquote>
 
 Kisma&trade; is PSR-0 compliant and can be installed using [composer](http://getcomposer.org/).  Simply require `kisma/kisma` to your composer.json file.
