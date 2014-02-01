@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of Kisma(tm).
+ * This file is part of Kisma(tm)
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
  * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
@@ -20,6 +20,8 @@
  */
 namespace Kisma\Core;
 
+use Kisma\Core\Interfaces\PublisherLike;
+use Kisma\Core\Interfaces\SeedLike;
 use Kisma\Core\Utility;
 
 /**
@@ -73,7 +75,7 @@ use Kisma\Core\Utility;
  * @property bool        $discoverEvents  Defaults to true.
  * @property string      $eventManager    Defaults to \Kisma\Core\Utility\EventManager
  */
-class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
+class Seed implements SeedLike, PublisherLike
 {
 	//********************************************************************************
 	//* Variables
@@ -112,7 +114,7 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	public function __construct( $settings = array() )
 	{
 		//	Since $_id is read-only we remove if you try to set it
-		if ( null !== ( $_id = Utility\Option::get( $settings, 'id' ) ) )
+		if ( null !== ($_id = Utility\Option::get( $settings, 'id' )) )
 		{
 			Utility\Option::remove( $settings, 'id' );
 		}
@@ -127,7 +129,7 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 					try
 					{
 						Utility\Option::set( $this, $_key, $_value );
-						unset( $settings, $_key );
+						unset($settings, $_key);
 						continue;
 					}
 					catch ( \Exception $_ex )
@@ -140,8 +142,8 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 
 				if ( method_exists( $this, $_setter ) )
 				{
-					call_user_func( array( $this, $_setter ), $_value );
-					unset( $settings, $_key, $_setter );
+					call_user_func( array($this, $_setter), $_value );
+					unset($settings, $_key, $_setter);
 				}
 			}
 		}
@@ -170,7 +172,7 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 			$this->_name = Utility\Inflector::tag( get_called_class() );
 		}
 
-		if ( !( $this instanceof Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
+		if ( !($this instanceof Interfaces\SubscriberLike) || empty($this->_eventManager) )
 		{
 			//	Ignore event junk later
 			$this->_eventManager = false;
@@ -181,10 +183,8 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 		if ( false !== $this->_discoverEvents )
 		{
 			//	Subscribe to events...
-			call_user_func(
-				array( $this->_eventManager, 'subscribe' ),
-				$this
-			);
+			call_user_func( array($this->_eventManager, 'subscribe'),
+				$this );
 		}
 
 		//	Publish after_construct event
@@ -219,7 +219,7 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	public function publish( $eventName, $eventData = null )
 	{
 		//	A little chicanery...
-		return false !== $this->_eventManager ? call_user_func( array( $this->_eventManager, 'publish' ), $this, $eventName, $eventData ) : false;
+		return false !== $this->_eventManager ? call_user_func( array($this->_eventManager, 'publish'), $this, $eventName, $eventData ) : false;
 	}
 
 	/**
@@ -231,14 +231,12 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	public function on( $tag, $listener = null )
 	{
 		//  Add our event handlers
-		if ( $this instanceof Interfaces\SubscriberLike && !empty( $this->_eventManager ) )
+		if ( $this instanceof Interfaces\SubscriberLike && !empty($this->_eventManager) )
 		{
-			return call_user_func(
-				array( $this->_eventManager, 'on' ),
+			return call_user_func( array($this->_eventManager, 'on'),
 				$this,
 				$tag,
-				$listener
-			);
+				$listener );
 		}
 
 		return false;

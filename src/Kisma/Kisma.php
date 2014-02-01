@@ -33,11 +33,11 @@ use Kisma\Core\Utility\Scalar;
  * Contains a few core functions implemented statically to be lightweight and single instance.
  *
  * @method static bool getConception() Gets the conception flag
- * @method static bool setConception( bool $how ) Sets the conception flag
- * @method static mixed getDebug() Gets the debug setting( s )
- * @method static mixed setDebug( mixed $how ) Sets the debug setting( s )
+ * @method static bool setConception(bool $how) Sets the conception flag
+ * @method static mixed getDebug() Gets the debug setting(s)
+ * @method static mixed setDebug(mixed $how) Sets the debug setting(s)
  * @method static \Composer\Autoload\ClassLoader getAutoLoader()
- * @method static mixed setAutoLoader( mixed $autoLoader )
+ * @method static mixed setAutoLoader(mixed $autoLoader)
  */
 class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, KismaSettings
 {
@@ -57,15 +57,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	/**
 	 * @var array The library configuration options
 	 */
-	protected static $_options = array(
-		self::BasePath   => __DIR__,
-		self::AutoLoader => null,
-		self::Conception => false,
-		self::Version    => self::KismaVersion,
-		self::Name       => 'App',
-		self::NavBar     => null,
-		self::Framework  => null,
-	);
+	protected static $_options = array(self::BasePath   => __DIR__,
+									   self::AutoLoader => null,
+									   self::Conception => false,
+									   self::Version    => self::KismaVersion,
+									   self::Name       => 'App',
+									   self::NavBar     => null,
+									   self::Framework  => null,);
 
 	//**************************************************************************
 	//* Methods
@@ -93,15 +91,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 		static::$_options = Option::merge( static::$_options, $options );
 
 		//	Register our faux-destructor
-		if ( false === ( $_conceived = static::getConception() ) )
+		if ( false === ($_conceived = static::getConception()) )
 		{
-			\register_shutdown_function(
-				function ( $eventName = Kisma::Death )
+			\register_shutdown_function( function ( $eventName = Kisma::Death )
 				{
 					\Kisma::__sleep();
 					EventManager::publish( null, $eventName );
-				}
-			);
+				} );
 
 			//	Try and detect the framework being used...
 			Detector::framework();
@@ -127,7 +123,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __sleep()
 	{
 		//	Save options out to session...
-		if ( isset( $_SESSION ) )
+		if ( isset($_SESSION) )
 		{
 			$_SESSION['kisma.options'] = static::$_options;
 		}
@@ -139,13 +135,11 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __wakeup()
 	{
 		//	Load options from session...
-		if ( isset( $_SESSION, $_SESSION['kisma.options'] ) )
+		if ( isset($_SESSION, $_SESSION['kisma.options']) )
 		{
 			//	Merge them into the fold
-			static::$_options = array_merge(
-				$_SESSION['kisma.options'],
-				static::$_options
-			);
+			static::$_options = array_merge( $_SESSION['kisma.options'],
+				static::$_options );
 		}
 	}
 
@@ -219,11 +213,11 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 			{
 				array_unshift( $arguments, $_tag );
 
-				return call_user_func_array( array( __CLASS__, $_type ), $arguments );
+				return call_user_func_array( array(__CLASS__, $_type), $arguments );
 			}
 		}
 
-		throw new \BadMethodCallException( 'The method "' . $name . '" does not exist, or at least, I can\'t find it.' );
+		throw new \BadMethodCallException('The method "' . $name . '" does not exist, or at least, I can\'t find it.');
 	}
 
 	/**

@@ -1,6 +1,6 @@
 ![Kisma](https://github.com/lucifurious/kisma/raw/master/assets/logo-kisma.png)
 
-# Kisma&trade;: PHP Utility Belt v0.2.x
+# Kisma&trade;: PHP Utility Kernel v0.3.x-dev
 Thanks for checking out *Kisma*!
 
 <a href="http://www.jetbrains.com/phpstorm/" style="display:block;alt="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers" title="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers">
@@ -44,34 +44,39 @@ I will be working on more documentation when I flesh out my model more.
 
 # Features
 
-* Easy to use/grasp/grok/work with
+* Easy to use and lightweight
 * Quicker to code repetitive tasks
-* All setters return $this for easy chaining
+* All setters return `$this` for easy chaining
 * Easy to configure
-* PSR-0 compliant
-* Registered with Packagist, Composer-compatible!
+* PSR-* compliant
+* Packagist/Composer-compatible!
 
 # Installation
 
 ## Composer
 
-Kisma&trade; is PSR-0 compliant and can be installed using [composer](http://getcomposer.org/).  Simply add `kisma/kisma` to your composer.json file.  _Composer is the sane
-alternative to PEAR.  It is excellent for managing dependancies in larger projects_.
+<blockquote cite="https://getcomposer.org/doc/00-intro.md">
+Composer is a tool for dependency management in PHP. It allows you to declare the dependent libraries your project needs and it will install them in your project for you.
+<br/>
+<div style="display: inline-block; font-size: 75%; color: #999999"><small><em>-- Composer Website</em></small></div>
+</blockquote>
+
+Kisma&trade; is PSR-0 compliant and can be installed using [composer](http://getcomposer.org/).  Simply require `kisma/kisma` to your composer.json file.
 
     {
         "require": {
-            "kisma/kisma": "*"
+            "kisma/kisma": "@stable"
         }
     }
 
 ## Install from Source
 
-Because Kisma&trade; is PSR-0 compliant, you can also just clone the repo and use a PSR-0 compatible autoloader to load the library, like [Symfony's](http://symfony.com/doc/current/components/class_loader.html).
+Because Kisma&trade; is PSR-0 compliant, you can also just clone the repo and use a PSR-0 compatible autoloader to load the library, like the one in [Symfony](http://symfony.com/doc/current/components/class_loader.html).
 
 ## Phar
 
 A [PHP Archive](http://php.net/manual/en/book.phar.php) (or .phar) file is not yet available.
 
 # Requirements
+
 * PHP v5.3+
- Kisma&trade; requires PHP v5.3.0+.

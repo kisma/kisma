@@ -18,51 +18,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Enums;
+namespace Kisma\Core\Enums\Events;
+
+use Kisma\Core\Enums\SeedEnum;
 
 /**
- * Standard ANSI color attributes
+ * SeedEvents
+ * Defines the events for all seeds
  */
-class AnsiColor extends SeedEnum
+class SeedEvents extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	/**
-	 * @var int Add this to a color to make it the background color (i.e. self::Red + self::Background)
+	 * @var string
 	 */
-	const Background = 10;
+	const AFTER_CONSTRUCT = 'kisma.core.seed.after_construct';
 	/**
-	 * @var int
+	 * @var string
 	 */
-	const Black = 30;
-	/**
-	 * @var int
-	 */
-	const Red = 31;
-	/**
-	 * @var int
-	 */
-	const Green = 32;
-	/**
-	 * @var int
-	 */
-	const Yellow = 33;
-	/**
-	 * @var int
-	 */
-	const Blue = 34;
-	/**
-	 * @var int
-	 */
-	const Magenta = 35;
-	/**
-	 * @var int
-	 */
-	const Cyan = 36;
-	/**
-	 * @var int
-	 */
-	const White = 37;
+	const BEFORE_DESTRUCT = 'kisma.core.seed.before_destruct';
 }
