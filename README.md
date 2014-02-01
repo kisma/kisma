@@ -55,8 +55,12 @@ I will be working on more documentation when I flesh out my model more.
 
 ## Composer
 
-Kisma&trade; is PSR-0 compliant and can be installed using [composer](http://getcomposer.org/).  Simply require `kisma/kisma` to your composer.json file.  <blockquote>_Composer is the sane
-alternative to PEAR.  It is excellent for managing dependancies in larger projects_.</blockquote>
+<blockquote cite="https://getcomposer.org/doc/00-intro.md">
+Composer is a tool for dependency management in PHP. It allows you to declare the dependent libraries your project needs and it will install them in your project for you.
+<small class="author">Composer Website</small>
+</blockquote>
+
+Kisma&trade; is PSR-0 compliant and can be installed using [composer](http://getcomposer.org/).  Simply require `kisma/kisma` to your composer.json file.
 
     {
         "require": {
