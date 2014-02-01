@@ -1,6 +1,6 @@
-log
-vendor
 .idea/
-tests/log/
-tests/metrics/
-doc
+vendor
+kisma.phar
+phpunit.xml
+composer.lock
+.DS_Store
