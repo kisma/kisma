@@ -33,5 +33,40 @@ class HashSeed extends SeedEnum implements \Kisma\Core\Interfaces\HashSeed
 	/**
 	 * @var int Default value
 	 */
-	const __default = self::All;
+	const __default = self::ALL;
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const ALL = 0;
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const ALPHA_LOWER = 1;
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const ALPHA_UPPER = 2;
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const ALPHA = 3;
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const ALPHA_NUMERIC = 4;
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const ALPHA_LOWER_NUMERIC = 5;
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const NUMERIC = 6;
+	/**
+	 * @const int The various supported hash types for Utility\Hash
+	 */
+	const ALPHA_LOWER_NUMERIC_IDIOT_PROOF = 7;
 }

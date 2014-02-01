@@ -18,12 +18,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Enums\Events;
+
+use Kisma\Core\Enums\SeedEnum;
 
 /**
- * GlobFlags
- * Ya know, for globbing...
+ * PublisherEvents
+ * Events for publishers
  */
-interface GlobFlags
+class PublisherEvents extends SeedEnum
 {
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	/**
+	 * @var string
+	 */
+	const BEFORE_PUBLISH = 'kisma.core.publisher.before_publish';
+	/**
+	 * @var string
+	 */
+	const PROPAGATION_STOPPED = 'kisma.core.publisher.propagation_stopped';
+	/**
+	 * @var string
+	 */
+	const AFTER_PUBLISH = 'kisma.core.publisher.after_publish';
 }

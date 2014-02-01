@@ -18,24 +18,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces\Events;
+namespace Kisma\Core\Enums\Events;
+
+use Kisma\Core\Enums\SeedEnum;
 
 /**
- * SeedLike
- * Defines the event interface for all seeds
+ * ServiceLike
+ * Defines the event interface for all services
  */
-interface SeedLike
+class ServiceEvents extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	/**
-	 * @var string
+	 * @var string Fired before service call
 	 */
-	const AfterConstruct = 'kisma.core.seed_like.after_construct';
+	const PRE_PROCESS = 'kisma.core.service.pre_process';
 	/**
-	 * @var string
+	 * @var string Fired when the service call did not fail
 	 */
-	const BeforeDestruct = 'kisma.core.seed_like.before_destruct';
+	const SUCCESS = 'kisma.core.service.success';
+	/**
+	 * @var string Fired if the service call fails
+	 */
+	const FAILURE = 'kisma.core.service.failure';
+	/**
+	 * @var string Fired when the service call is complete, regardless of failure
+	 */
+	const COMPLETE = 'kisma.core.service.complete';
+	/**
+	 * @var string Fired after service call
+	 */
+	const POST_PROCESS = 'kisma.core.service.post_process';
 }

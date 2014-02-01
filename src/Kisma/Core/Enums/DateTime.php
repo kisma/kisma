@@ -33,50 +33,49 @@ class DateTime extends SeedEnum
 	/**
 	 * @var int
 	 */
-	const __default = self::SecondsPerMinute;
-
+	const __default = self::SECONDS_PER_MINUTE;
 	/**
 	 * @var int circa 01/01/1980 (Ahh... my TRS-80... good times)
 	 */
-	const TheBeginning = 315550800;
+	const THE_BEGINNING = 315550800;
 	/**
 	 * @var int
 	 */
-	const MicroSecondsPerSecond = 1000000;
+	const MICROSECONDS_PER_SECOND = 1000000;
 	/**
 	 * @var int
 	 */
-	const MilliSecondsPerSecond = 1000;
+	const MILLISECONDS_PER_SECOND = 1000;
 	/**
 	 * @var int
 	 */
-	const SecondsPerMinute = 60;
+	const SECONDS_PER_MINUTE = 60;
+	/**
+	 * @var int A 24th of a day
+	 */
+	const SECONDS_PER_HOUR = 3600;
+	/**
+	 * @var int An 8th of a day
+	 */
+	const SECONDS_PER_EIGHTH_DAY = 10800;
+	/**
+	 * @var int A 4th of a day
+	 */
+	const SECONDS_PER_QUARTER_DAY = 21600;
+	/**
+	 * @var int A half of a day
+	 */
+	const SECONDS_PER_HALF_DAY = 43200;
+	/**
+	 * @var int A full day
+	 */
+	const SECONDS_PER_DAY = 86400;
 	/**
 	 * @var int
 	 */
-	const SecondsPerHour = 3600;
-	/**
-	 * @var int
-	 */
-	const SecondsPerEighthDay = 10800;
-	/**
-	 * @var int
-	 */
-	const SecondsPerQuarterDay = 21600;
-	/**
-	 * @var int
-	 */
-	const SecondsPerHalfDate = 43200;
-	/**
-	 * @var int
-	 */
-	const SecondsPerDay = 86400;
-	/**
-	 * @var int
-	 */
-	const SecondsPerWeek = 604800;
+	const SECONDS_PER_WEEK = 604800;
 	/**
 	 * @var int circa 01/01/2038 (despite the Mayan calendar or John Titor...)
 	 */
-	const TheEnd = 2145934800;
+	const THE_END = 2145934800;
 }

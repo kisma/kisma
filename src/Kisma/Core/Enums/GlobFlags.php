@@ -24,7 +24,7 @@ namespace Kisma\Core\Enums;
  * GlobFlags
  * Ya know, for globbing...
  */
-class GlobFlags extends SeedEnum implements \Kisma\Core\Interfaces\GlobFlags
+class GlobFlags extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -33,33 +33,17 @@ class GlobFlags extends SeedEnum implements \Kisma\Core\Interfaces\GlobFlags
 	/**
 	 * @var int
 	 */
-	const GLOB_NODIR = 0x0100;
+	const NO_DIR = 0x0100;
 	/**
 	 * @var int
 	 */
-	const GLOB_PATH = 0x0200;
+	const PATH = 0x0200;
 	/**
 	 * @var int
 	 */
-	const GLOB_NODOTS = 0x0400;
+	const NO_DOTS = 0x0400;
 	/**
 	 * @var int
 	 */
-	const GLOB_RECURSE = 0x0800;
-	/**
-	 * @var int
-	 */
-	const NoDir = 0x0100;
-	/**
-	 * @var int
-	 */
-	const Path = 0x0200;
-	/**
-	 * @var int
-	 */
-	const NoDots = 0x0400;
-	/**
-	 * @var int
-	 */
-	const Recurse = 0x0800;
+	const RECURSE = 0x0800;
 }

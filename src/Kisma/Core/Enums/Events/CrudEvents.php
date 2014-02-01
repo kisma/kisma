@@ -18,36 +18,50 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces\Events;
+namespace Kisma\Core\Enums\Events;
+
+use Kisma\Core\Enums\SeedEnum;
 
 /**
- * ServiceLike
- * Defines the event interface for all services
+ * CrudEvents
+ * Defines an interface for CRUD service events
  */
-interface ServiceLike
+class CrudEvents extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	/**
-	 * @var string Fired before service call
+	 * @var string
 	 */
-	const BeforeServiceCall = 'kisma.core.service_like.before_service_call';
+	const BEFORE_CREATE = 'kisma.core.crud.before_create';
 	/**
-	 * @var string Fired when the service call succeeded
+	 * @var string
 	 */
-	const Success = 'kisma.core.service_like.success';
+	const AFTER_CREATE = 'kisma.core.crud.after_create';
 	/**
-	 * @var string Fired if there was a failure in the service call
+	 * @var string
 	 */
-	const Failure = 'kisma.core.service_like.failure';
+	const BEFORE_READ = 'kisma.core.crud.before_read';
 	/**
-	 * @var string Fired after service call
+	 * @var string
 	 */
-	const AfterServiceCall = 'kisma.core.service_like.after_service_call';
+	const AFTER_READ = 'kisma.core.crud.after_read';
 	/**
-	 * @var string Fired when processing is complete
+	 * @var string
 	 */
-	const Complete = 'kisma.core.service_like.complete';
+	const BEFORE_UPDATE = 'kisma.core.crud.before_update';
+	/**
+	 * @var string
+	 */
+	const AFTER_UPDATE = 'kisma.core.crud.after_update';
+	/**
+	 * @var string
+	 */
+	const BEFORE_DELETE = 'kisma.core.crud.before_delete';
+	/**
+	 * @var string
+	 */
+	const AFTER_DELETE = 'kisma.core.crud.after_delete';
 }

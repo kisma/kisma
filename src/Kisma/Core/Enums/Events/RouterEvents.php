@@ -18,13 +18,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces\Events;
+namespace Kisma\Core\Enums\Events;
+
+use Kisma\Core\Enums\SeedEnum;
 
 /**
- * PublisherLike
- * Events for event publishers
+ * RouterEvents
+ * The core events raised by service routers
  */
-interface PublisherLike
+class RouterEvents extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -33,9 +35,17 @@ interface PublisherLike
 	/**
 	 * @var string
 	 */
-	const BeforePublish = 'kisma.core.publisher.before_publish';
+	const REQUEST_RECEIVED = 'kisma.core.router.request_received';
 	/**
 	 * @var string
 	 */
-	const AfterPublish = 'kisma.core.publisher.after_publish';
+	const PRE_PROCESS = 'kisma.core.router.pre_process';
+	/**
+	 * @var string
+	 */
+	const POST_PROCESS = 'kisma.core.router.post_process';
+	/**
+	 * @var string
+	 */
+	const REQUEST_COMPLETE = 'kisma.core.router.request_complete';
 }

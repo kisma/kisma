@@ -12,6 +12,8 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
 {
 
 	/**
+	 * Tests the fringe cases
+	 *
 	 * @covers \Kisma\Core\Utility\Inflector::pluralize
 	 */
 	public function testPluralize()

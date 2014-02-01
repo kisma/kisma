@@ -21,6 +21,7 @@
 namespace Kisma\Core\Enums;
 
 use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Utility\Option;
 
 /**
  * SeedEnum
@@ -50,29 +51,33 @@ abstract class SeedEnum
 	}
 
 	/**
-	 * @param string $class
-	 * @param array  $seedConstants Seeds the cache with these optional KVPs
-	 * @param bool   $overwrite
+	 * Returns all my constants as an array of Name => Value pairs
 	 *
-	 * @return string
+	 * @param bool $includeDefault Whether to include __default property.
+	 * @param bool $flipped        If true, array is flipped to Value => Name pairs before return
+	 * @param bool $overwrite
+	 *
+	 * @return array
 	 */
-	public static function introspect( $class = null, array $seedConstants = array(), $overwrite = true )
+	public static function getConstList( $includeDefault = true, $flipped = false, $overwrite = false )
 	{
-		$_key = static::_cacheKey( $class );
+		$_key = static::_cacheKey( $_class = get_called_class() );
 
-		if ( true === $overwrite || !isset( static::$_constants[$_key] ) )
+		if ( $overwrite || null === ( $_constants = Option::get( $_key, static::$_constants ) ) )
 		{
-			$_mirror = new \ReflectionClass( $class ? : \get_called_class() );
-
-			static::$_constants[$_key] = array_merge(
-				$seedConstants,
-				$_mirror->getConstants()
-			);
-
+			$_mirror = new \ReflectionClass( $_class );
+			$_constants = $_mirror->getConstants();
 			unset( $_mirror );
+
+			if ( false === $includeDefault && isset( $_constants['__default'] ) )
+			{
+				unset( $_constants['__default'] );
+			}
+
+			static::$_constants[$_key] = $_constants;
 		}
 
-		return $_key;
+		return $flipped ? array_flip( $_constants ) : $_constants;
 	}
 
 	/**
@@ -86,56 +91,43 @@ abstract class SeedEnum
 	{
 		static $_key = null;
 
-		return $_key ? : Inflector::tag( $class ? : \get_called_class(), true );
-	}
-
-	/**
-	 * Adds constants to the cache for a particular class. Roll-your-own ENUM
-	 *
-	 * @param array  $constants
-	 * @param string $class
-	 *
-	 * @return void
-	 */
-	public static function seedConstants( array $constants, $class = null )
-	{
-		static::introspect( $class, $constants );
+		return $_key ? : Inflector::neutralize( $class ? : \get_called_class(), true );
 	}
 
 	/**
 	 * Returns a hash of the called class's constants ( CONSTANT_NAME => value ). Caches for speed
 	 * (class cache hash, say that ten times fast!).
 	 *
-	 * @param bool   $flipped  If true, the array is flipped before return ( value => CONSTANT_NAME )
-	 * @param string $class    Used internally to cache constants
-	 * @param bool   $listData If true, the constant names themselves are cleaned up for display purposes.
+	 * @param bool   $flipped If true, the array is flipped before return ( value => CONSTANT_NAME )
+	 * @param string $class   Used internally to cache constants
+	 * @param bool   $pretty  If true, the constant names themselves are cleaned up for display purposes.
 	 *
 	 * @return array
 	 */
-	public static function getDefinedConstants( $flipped = false, $class = null, $listData = false )
+	public static function getDefinedConstants( $flipped = false, $class = null, $pretty = false )
 	{
-		$_key = static::introspect( $class, array(), false );
+		$_constants = static::getConstList( !$pretty, !$pretty ? $flipped : false );
 
-		$_constants = false === $flipped ? static::$_constants[$_key] : array_flip( static::$_constants[$_key] );
-
-		if ( false === $listData )
+		if ( !$pretty )
 		{
 			return $_constants;
 		}
 
-		$_temp = array();
+		$_work = $flipped ? $_constants : array_flip( $_constants );
 
-		foreach ( static::$_constants[$_key] as $_constant => $_value )
-		{
-			$_temp[$_value] = Inflector::display( Inflector::neutralize( $_constant ) );
-			unset( $_value, $_option );
-		}
+		array_walk(
+			$_work,
+			function ( &$value )
+			{
+				$value = Inflector::display( $value );
+			}
+		);
 
-		return $_temp;
+		return $flipped ? $_constants : array_flip( $_constants );
 	}
 
 	/**
-	 * Returns true or false if this class contains a specific constant value.
+	 * Returns true or false if this class contains a specific constant VALUE (not the name).
 	 *
 	 * Use for validity checks:
 	 *
@@ -143,13 +135,23 @@ abstract class SeedEnum
 	 *        throw new \InvalidArgumentException( 'Sorry, your selection of "' . $evenCoolerShit . '" is invalid.' );
 	 *    }
 	 *
-	 * @param mixed $value
+	 * @param mixed $value      The constant's value
+	 * @param bool  $returnName If true, returns the name of the constant if found, but throws an exception if not
 	 *
+	 * @throws \InvalidArgumentException
 	 * @return bool
 	 */
-	public static function contains( $value )
+	public static function contains( $value, $returnName = false )
 	{
-		return in_array( $value, array_values( static::getDefinedConstants() ) );
+		$_constants = static::getConstList( true, true );
+		$_has = isset( $_constants[$value] );
+
+		if ( false === $_has && false !== $returnName )
+		{
+			throw new \InvalidArgumentException( 'The constant value "' . $value . '" is not defined.' );
+		}
+
+		return $returnName ? $_constants[$value] : $_has;
 	}
 
 	/**
@@ -159,11 +161,11 @@ abstract class SeedEnum
 	 *
 	 * Use for validity checks:
 	 *
-	 *    if ( false === VeryCoolShit::contains( $evenCoolerShit ) ) {
+	 *    if ( false === VeryCoolShit::defines( $evenCoolerShit ) ) {
 	 *        throw new \InvalidArgumentException( 'Sorry, your selection of "' . $evenCoolerShit . '" is invalid.' );
 	 *    }
 	 *
-	 * @param string $constant
+	 * @param string $constant    The constant name
 	 * @param bool   $returnValue If true, returns the value of the constant if found, but throws an exception if not
 	 *
 	 * @throws \InvalidArgumentException
@@ -171,7 +173,7 @@ abstract class SeedEnum
 	 */
 	public static function defines( $constant, $returnValue = false )
 	{
-		$_constants = static::getDefinedConstants();
+		$_constants = static::getConstList();
 		$_has = isset( $_constants[$constant] );
 
 		if ( false === $_has && false !== $returnValue )
@@ -179,14 +181,14 @@ abstract class SeedEnum
 			throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
 		}
 
-		return false === $returnValue ? $_has : $_constants[$constant];
+		return $returnValue ? $_constants[$constant] : $_has;
 	}
 
 	/**
-	 * Returns the constant name as a string
+	 * Given a constant VALUE, return the constant NAME as a string
 	 *
 	 * @param string $constant
-	 * @param bool   $flipped If false, the $constantValue should contain the constant name and the value will be returned
+	 * @param bool   $flipped If false, $constant should contain the constant name and the value will be returned
 	 * @param bool   $pretty  If true, returned value is prettified (acme.before_event becomes "Acme Before Event")
 	 *
 	 * @throws \InvalidArgumentException
@@ -194,12 +196,9 @@ abstract class SeedEnum
 	 */
 	public static function nameOf( $constant, $flipped = true, $pretty = true )
 	{
-		if ( in_array( $constant, array_keys( $_constants = static::getDefinedConstants( $flipped ) ) ) )
-		{
-			return $pretty ? Inflector::display( Inflector::neutralize( $_constants[$constant] ) ) : $_constants[$constant];
-		}
+		$_name = $flipped ? static::defines( $constant, true ) : static::contains( $constant, true );
 
-		throw new \InvalidArgumentException( 'A constant with the value of "' . $constant . '" does not exist.' );
+		return $pretty ? Inflector::display( $_name ) : $_name;
 	}
 
 	/**

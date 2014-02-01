@@ -18,20 +18,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces\Events;
+namespace Kisma\Core\Enums\Events;
 
 /**
- * Http
- * Defines an interface the Http service class knows how to deal with
+ * LifeEvents
+ * The kernel-level events
  */
-interface Http
+interface LifeEvents
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	/**
-	 * @var string
+	 * @var string Creation
 	 */
-	const RequestReceived = 'kisma.core.services.network.http.request_received';
+	const BIRTH = 'kisma.birth';
+	/**
+	 * @var string Destruction
+	 */
+	const DEATH = 'kisma.death';
 }

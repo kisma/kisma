@@ -76,7 +76,7 @@ class Inflector implements UtilityLike
 	 */
 	public static function untag( $tag )
 	{
-		return self::neutralize( $tag );
+		return static::neutralize( $tag );
 	}
 
 	/**
@@ -88,15 +88,15 @@ class Inflector implements UtilityLike
 	 */
 	public static function display( $item )
 	{
-		return self::camelize(
-			str_replace(
-				array( '_', '.', '\\', '/' ),
-				' ',
-				$item
-			),
-			'_',
-			true,
-			false
+		return static::camelize(
+					 str_replace(
+						 array('_', '.', '\\', '/'),
+						 ' ',
+						 static::neutralize( $item )
+					 ),
+					 '_',
+					 true,
+					 false
 		);
 	}
 
@@ -111,15 +111,15 @@ class Inflector implements UtilityLike
 	 */
 	public static function deneutralize( $item, $isKey = false, $delimiter = '\\' )
 	{
-		return self::camelize(
-			str_replace(
-				array( '_', '.', $delimiter ),
-				' ',
-				$item
-			),
-			'_',
-			false,
-			$isKey
+		return static::camelize(
+					 str_replace(
+						 array('_', '.', $delimiter),
+						 ' ',
+						 $item
+					 ),
+					 '_',
+					 false,
+					 $isKey
 		);
 	}
 
@@ -144,10 +144,10 @@ class Inflector implements UtilityLike
 	{
 		if ( false !== $isKey )
 		{
-			return self::neutralize( $tag, $strip );
+			return static::neutralize( $tag, $strip );
 		}
 
-		$_tag = self::deneutralize( $tag );
+		$_tag = static::deneutralize( $tag );
 
 		return $_tag;
 	}
@@ -182,7 +182,7 @@ class Inflector implements UtilityLike
 			$_newString = lcfirst( $_newString );
 		}
 
-		return ( false === $preserveWhiteSpace ? str_replace( ' ', null, $_newString ) : $_newString );
+		return (false === $preserveWhiteSpace ? str_replace( ' ', null, $_newString ) : $_newString);
 	}
 
 	/**
@@ -207,7 +207,7 @@ class Inflector implements UtilityLike
 	 */
 	public static function isPlural( $word, $returnSingular = false )
 	{
-		if ( empty( $word ) || !is_string( $word ) || strlen( $word ) < 3 )
+		if ( empty($word) || !is_string( $word ) || strlen( $word ) < 3 )
 		{
 			return false;
 		}
@@ -296,11 +296,11 @@ class Inflector implements UtilityLike
 
 		$_parts = explode( ' ', $words );
 
-		if ( !empty( $_parts ) )
+		if ( !empty($_parts) )
 		{
 			foreach ( $_parts as $_part )
 			{
-				$_cleaned .= ' ' . ( $_part != strtoupper( $_part ) ? ucwords( $_part ) : $_part );
+				$_cleaned .= ' ' . ($_part != strtoupper( $_part ) ? ucwords( $_part ) : $_part);
 			}
 		}
 
