@@ -42,7 +42,8 @@ class Option
 
 		//	Check both the raw and cooked keys
 		return
-			( is_array( $options ) && ( isset( $options[$key] ) || isset( $options[$_key] ) ) ) ||
+			( static::arrayLike( $options ) &&
+				( array_key_exists( $key, $options ) || array_key_exists( $_key, $options ) || array_key_exists( ucfirst( $_key ), $options ) ) ) ||
 			( is_object( $options ) && ( property_exists( $options, $key ) || property_exists( $options, $_key ) ) );
 	}
 
@@ -67,6 +68,209 @@ class Option
 	}
 
 	/**
+	 * Standard way to see if an object has array access (i.e. $object['key'])
+	 *
+	 * @param mixed $object
+	 *
+	 * @return bool
+	 */
+	public static function arrayLike( $object )
+	{
+		return ( is_array( $object ) || $object instanceof \ArrayAccess );
+	}
+
+	/**
+	 * Retrieves a a value from the given object.
+	 * If $key is not set, the value is set to $defaultValue and returned.
+	 * Optionally will unset option in array.
+	 *
+	 * @param object     $object
+	 * @param string     $key
+	 * @param mixed|null $defaultValue
+	 * @param boolean    $unsetValue
+	 *
+	 * @return mixed
+	 */
+	public static function getFromObject( &$object, $key, $defaultValue = null, $unsetValue = false )
+	{
+		$_key = $key;
+		$_cleanKey = static::_cleanKey( $key );
+		$_newValue = $defaultValue;
+
+		if ( $_key != $_cleanKey && !property_exists( $object, $_key ) )
+		{
+			if ( property_exists( $object, $_cleanKey ) )
+			{
+				$_key = $_cleanKey;
+			}
+			else if ( property_exists( $object, ucfirst( $_cleanKey ) ) )
+			{
+				$_key = ucfirst( $_cleanKey );
+			}
+		}
+
+		if ( property_exists( $object, $_key ) )
+		{
+			$_newValue = $object->{$_key};
+
+			if ( false !== $unsetValue )
+			{
+				unset( $object->{$_key} );
+			}
+
+			return $_newValue;
+		}
+
+		if ( method_exists( $object, 'get' . $key ) )
+		{
+			$_method = 'get' . $_key;
+		}
+		else if ( method_exists( $object, 'get_' . $_cleanKey ) )
+		{
+			$_method = 'get_' . $_cleanKey;
+		}
+		else
+		{
+			//	Nada...
+			return $_newValue;
+		}
+
+		$_getter = $_method;
+		$_setter = 's' . substr( $_method, 1 );
+		$_newValue = $object->{$_getter}();
+
+		if ( false !== $unsetValue && method_exists( $object, $_setter ) )
+		{
+			$object->{$_setter}( null );
+		}
+
+		return $_newValue;
+	}
+
+	/**
+	 * Retrieves a a value from the given object.
+	 * If $key is not set, the value is set to $defaultValue and returned.
+	 * Optionally will unset option in array.
+	 *
+	 * @param object $object
+	 * @param string $key
+	 * @param mixed  $value
+	 */
+	public static function setObjectValue( &$object, $key, $value = null )
+	{
+		$_key = $key;
+		$_cleanKey = static::_cleanKey( $key );
+
+		if ( $_key != $_cleanKey && !property_exists( $object, $_key ) )
+		{
+			if ( property_exists( $object, $_cleanKey ) )
+			{
+				$_key = $_cleanKey;
+			}
+			else if ( property_exists( $object, ucfirst( $_cleanKey ) ) )
+			{
+				$_key = ucfirst( $_cleanKey );
+			}
+		}
+
+		if ( property_exists( $object, $_key ) )
+		{
+			$object->{$_key} = $value;
+		}
+		else
+		{
+			if ( method_exists( $object, 'set' . $key ) )
+			{
+				$_method = 'set' . $_key;
+			}
+			else if ( method_exists( $object, 'set_' . $_cleanKey ) )
+			{
+				$_method = 'set_' . $_cleanKey;
+			}
+			else
+			{
+				//	Nada...
+				return;
+			}
+
+			$_setter = $_method;
+			$object->{$_setter}( $value );
+		}
+	}
+
+	/**
+	 * Retrieves an option from the given array. $defaultValue is set and returned if $_key is not 'set'.
+	 * Optionally will unset option in array.
+	 *
+	 * @param array|\ArrayAccess $options
+	 * @param string             $key
+	 * @param mixed              $value
+	 */
+	public static function setArrayValue( &$options, $key, $value = null )
+	{
+		$_key = $key;
+		$_cleanKey = static::_cleanKey( $key );
+
+		//	Check for the original key too
+		if ( $_key != $_cleanKey && !array_key_exists( $_key, $options ) )
+		{
+			if ( array_key_exists( $_cleanKey, $options ) )
+			{
+				$_key = $_cleanKey;
+			}
+			else if ( array_key_exists( ucfirst( $_cleanKey ), $options ) )
+			{
+				$_key = ucfirst( $_cleanKey );
+			}
+		}
+
+		$options[$_key] = $value;
+	}
+
+	/**
+	 * Retrieves an option from the given array. $defaultValue is set and returned if $_key is not 'set'.
+	 * Optionally will unset option in array.
+	 *
+	 * @param array|\ArrayAccess|object $options
+	 * @param string                    $key
+	 * @param mixed|null                $defaultValue
+	 * @param boolean                   $unsetValue
+	 *
+	 * @return mixed
+	 */
+	public static function getFromArray( &$options, $key, $defaultValue = null, $unsetValue = false )
+	{
+		$_key = $key;
+		$_cleanKey = static::_cleanKey( $key );
+		$_newValue = $defaultValue;
+
+		//	Check for the original key too
+		if ( $_key != $_cleanKey && !array_key_exists( $_key, $options ) )
+		{
+			if ( array_key_exists( $_cleanKey, $options ) )
+			{
+				$_key = $_cleanKey;
+			}
+			else if ( array_key_exists( ucfirst( $_cleanKey ), $options ) )
+			{
+				$_key = ucfirst( $_cleanKey );
+			}
+		}
+
+		if ( array_key_exists( $_key, $options ) )
+		{
+			$_newValue = $options[$_key];
+
+			if ( false !== $unsetValue )
+			{
+				unset( $options[$_key] );
+			}
+		}
+
+		return $_newValue;
+	}
+
+	/**
 	 * Retrieves an option from the given array. $defaultValue is set and returned if $_key is not 'set'.
 	 * Optionally will unset option in array.
 	 *
@@ -84,70 +288,53 @@ class Option
 			return static::getMany( $options, $key, $defaultValue, $unsetValue );
 		}
 
-		$_originalKey = $key;
-
-		//	Inflect pain!
-		$key = static::_cleanKey( $key );
-
 		//	Set the default value
 		$_newValue = $defaultValue;
 
-		//	Get array value if it exists
-		if ( is_array( $options ) || $options instanceof \ArrayAccess )
-		{
-			//	Check for the original key too
-			if ( !isset( $options[$key] ) && isset( $options[$_originalKey] ) )
-			{
-				$key = $_originalKey;
-			}
-
-			if ( isset( $options[$key] ) )
-			{
-				$_newValue = $options[$key];
-
-				if ( false !== $unsetValue )
-				{
-					unset( $options[$key] );
-				}
-
-				return $_newValue;
-			}
-		}
-
+		//	Get object value if one
 		if ( is_object( $options ) )
 		{
-			if ( !property_exists( $options, $key ) && property_exists( $options, $_originalKey ) )
-			{
-				$key = $_originalKey;
-			}
-
-			if ( isset( $options->{$key} ) )
-			{
-				$_newValue = $options->{$key};
-
-				if ( false !== $unsetValue )
-				{
-					unset( $options->{$key} );
-				}
-
-				return $_newValue;
-			}
-			else if ( method_exists( $options, 'get' . $key ) )
-			{
-				$_getter = 'get' . Inflector::deneutralize( $key );
-				$_setter = 'set' . Inflector::deneutralize( $key );
-
-				$_newValue = $options->{$_getter}();
-
-				if ( false !== $unsetValue && method_exists( $options, $_setter ) )
-				{
-					$options->{$_setter}( null );
-				}
-			}
+			return static::getFromObject( $options, $key, $defaultValue, $unsetValue );
 		}
 
-		//	Return the default...
+		//	Get array value if it exists
+		if ( static::arrayLike( $options ) )
+		{
+			return static::getFromArray( $options, $key, $defaultValue, $unsetValue );
+		}
+
+		//	Otherwise just return the default value
 		return $_newValue;
+	}
+
+	/**
+	 * Sets an value in the given array at key.
+	 *
+	 * @param array|\ArrayAccess|object $options
+	 * @param string|array              $key Pass a single key or an array of KVPs
+	 * @param mixed|null                $value
+	 *
+	 * @return array|string
+	 */
+	public static function set( &$options = array(), $key, $value = null )
+	{
+		$_options = static::collapse( $key, $value );
+
+		foreach ( $_options as $_key => $_value )
+		{
+			if ( is_object( $options ) )
+			{
+				static::setObjectValue( $options, $_key, $_value );
+				continue;
+			}
+
+			//	Set array value if it exists
+			if ( static::arrayLike( $options ) )
+			{
+				static::setArrayValue( $options, $_key, $_value );
+				continue;
+			}
+		}
 	}
 
 	/**
@@ -222,104 +409,26 @@ class Option
 	}
 
 	/**
-	 * Sets an value in the given array at key.
-	 *
-	 * @param array|\ArrayAccess|object $options
-	 * @param string|array              $key Pass a single key or an array of KVPs
-	 * @param mixed|null                $value
-	 *
-	 * @return array|string
-	 */
-	public static function set( &$options = array(), $key, $value = null )
-	{
-		$_options = static::collapse( $key, $value );
-
-		foreach ( $_options as $_key => $_value )
-		{
-			$_cleanKey = static::_cleanKey( $_key );
-
-			if ( is_array( $options ) )
-			{
-				//	Check for the original key too
-				if ( !array_key_exists( $_key, $options ) && array_key_exists( $_cleanKey, $options ) )
-				{
-					$_key = $_cleanKey;
-				}
-
-				$options[$_key] = $_value;
-
-				continue;
-			}
-
-			if ( is_object( $options ) )
-			{
-				$_setter = 'set' . Inflector::deneutralize( $_key );
-
-				//	Prefer setter, if one...
-				if ( method_exists( $options, $_setter ) )
-				{
-					$options->{$_setter}( $_value );
-				}
-				else
-				{
-					if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
-					{
-						$_key = $_cleanKey;
-					}
-
-					//	Set it verbatim
-					$options->{$_key} = $_value;
-				}
-			}
-		}
-	}
-
-	/**
 	 * Unsets an option in the given array
 	 *
-	 * @param array  $options
-	 * @param string $key
+	 * @param array|\ArrayAccess|object $options
+	 * @param string                    $key
 	 *
 	 * @return mixed
 	 */
 	public static function remove( &$options = array(), $key )
 	{
-		$_originalValue = null;
-
-		if ( static::contains( $options, $key ) )
+		if ( static::arrayLike( $options ) )
 		{
-			$_cleanedKey = static::_cleanKey( $key );
-
-			if ( is_array( $options ) )
-			{
-				if ( !isset( $options[$key] ) && isset( $options[$_cleanedKey] ) )
-				{
-					$key = $_cleanedKey;
-				}
-
-				if ( isset( $options[$key] ) )
-				{
-					$_originalValue = $options[$key];
-					unset( $options[$key] );
-				}
-			}
-			else
-			{
-				if ( !isset( $options->{$key} ) && isset( $options->{$_cleanedKey} ) )
-				{
-					$key = $_cleanedKey;
-				}
-
-				if ( isset( $options->{$key} ) )
-				{
-					$_originalValue = $options->{$key};
-				}
-
-				unset( $options->{$key} );
-			}
+			return static::getFromArray( $options, $key, null, true );
 		}
 
-		return $_originalValue;
+		if ( is_object( $options ) )
+		{
+			return static::getFromObject( $options, $key, null, true );
+		}
+
+		return null;
 	}
 
 	/**
@@ -415,15 +524,17 @@ class Option
 	/**
 	 * Wrapper for a static::get on $_REQUEST
 	 *
-	 * @param string $key
-	 * @param string $defaultValue
-	 * @param bool   $unsetValue
+	 * @param string   $key
+	 * @param string   $defaultValue
+	 * @param bool|int $filter
 	 *
 	 * @return mixed
 	 */
-	public static function request( $key, $defaultValue = null, $unsetValue = false )
+	public static function request( $key, $defaultValue = null, $filter = FILTER_SANITIZE_STRING )
 	{
-		return static::get( $_REQUEST, $key, $defaultValue, $unsetValue );
+		$_value = FilterInput::request( $key, $defaultValue, $filter ? : FILTER_SANITIZE_STRING );
+
+		return empty( $_value ) ? null : $_value;
 	}
 
 	/**
