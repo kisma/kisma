@@ -124,7 +124,7 @@ class SeedBagTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetIterator()
 	{
-		$this->assertInstanceOf( '\\Kisma\\Core\\SeedBagIterator', $this->object->getIterator() );
+		$this->assertInstanceOf( 'Kisma\\Core\\SeedBagIterator', $this->object->getIterator() );
 	}
 
 	/**
