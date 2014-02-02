@@ -20,9 +20,14 @@
  */
 namespace Kisma\Core;
 
+use Kisma\Core\Enums\Events\SeedEvents;
+use Kisma\Core\Events\SeedEvent;
 use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Interfaces\SeedLike;
-use Kisma\Core\Utility;
+use Kisma\Core\Interfaces\SubscriberLike;
+use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Utility\Option;
+use Kisma\Kisma;
 
 /**
  * Seed
@@ -96,11 +101,11 @@ class Seed implements SeedLike, PublisherLike
 	/**
 	 * @var bool If false, event handlers must be defined manually
 	 */
-	protected $_discoverEvents = true;
+	protected $_discoverEvents = false;
 	/**
-	 * @var string The class name of the event manager
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcher The class name of the event manager
 	 */
-	protected $_eventManager = self::DefaultEventManager;
+	protected $_eventManager = null;
 
 	//********************************************************************************
 	//* Methods
@@ -114,9 +119,9 @@ class Seed implements SeedLike, PublisherLike
 	public function __construct( $settings = array() )
 	{
 		//	Since $_id is read-only we remove if you try to set it
-		if ( null !== ($_id = Utility\Option::get( $settings, 'id' )) )
+		if ( null !== ( $_id = Option::get( $settings, 'id' ) ) )
 		{
-			Utility\Option::remove( $settings, 'id' );
+			Option::remove( $settings, 'id' );
 		}
 
 		//	Otherwise, set the rest
@@ -128,8 +133,8 @@ class Seed implements SeedLike, PublisherLike
 				{
 					try
 					{
-						Utility\Option::set( $this, $_key, $_value );
-						unset($settings, $_key);
+						Option::set( $this, $_key, $_value );
+						unset( $settings, $_key );
 						continue;
 					}
 					catch ( \Exception $_ex )
@@ -138,12 +143,12 @@ class Seed implements SeedLike, PublisherLike
 					}
 				}
 
-				$_setter = Utility\Inflector::tag( 'set_' . $_key );
+				$_setter = Inflector::tag( 'set_' . $_key );
 
 				if ( method_exists( $this, $_setter ) )
 				{
-					call_user_func( array($this, $_setter), $_value );
-					unset($settings, $_key, $_setter);
+					call_user_func( array( $this, $_setter ), $_value );
+					unset( $settings, $_key, $_setter );
 				}
 			}
 		}
@@ -159,20 +164,18 @@ class Seed implements SeedLike, PublisherLike
 	{
 		//	This is my hash. There are many like it, but this one is mine.
 		$this->_id = hash( 'sha256', spl_object_hash( $this ) . getmypid() . microtime( true ) );
-		//Utility\Log::debug( 'New seed spawned: ' . $this->_id );
 
 		//	Auto-set tag and name if they're empty
 		if ( null === $this->_tag )
 		{
-			$this->_tag = Utility\Inflector::tag( get_called_class(), true );
+			$this->_tag = Inflector::neutralize( get_called_class(), true );
 		}
 
-		if ( null === $this->_name )
-		{
-			$this->_name = Utility\Inflector::tag( get_called_class() );
-		}
+		$this->_name = $this->_name ? : $this->_tag;
 
-		if ( !($this instanceof Interfaces\SubscriberLike) || empty($this->_eventManager) )
+		$this->_eventManager = Kisma::getDispatcher();
+
+		if ( empty( $this->_eventManager ) || !( $this instanceof SubscriberLike ) )
 		{
 			//	Ignore event junk later
 			$this->_eventManager = false;
@@ -180,15 +183,17 @@ class Seed implements SeedLike, PublisherLike
 		}
 
 		//	Add the event service and attach any event handlers we find...
-		if ( false !== $this->_discoverEvents )
+		if ( $this->_eventManager && false !== $this->_discoverEvents )
 		{
 			//	Subscribe to events...
-			call_user_func( array($this->_eventManager, 'subscribe'),
-				$this );
+			call_user_func(
+				array( $this->_eventManager, 'subscribe' ),
+				$this
+			);
 		}
 
 		//	Publish after_construct event
-		$this->publish( self::AfterConstruct );
+		$this->publish( SeedEvents::AFTER_CONSTRUCT );
 	}
 
 	/**
@@ -199,7 +204,7 @@ class Seed implements SeedLike, PublisherLike
 		try
 		{
 			//	Publish after_destruct event
-			$this->publish( self::BeforeDestruct );
+			$this->publish( SeedEvents::BEFORE_DESTRUCT );
 		}
 		catch ( \Exception $_ex )
 		{
@@ -218,8 +223,10 @@ class Seed implements SeedLike, PublisherLike
 	 */
 	public function publish( $eventName, $eventData = null )
 	{
-		//	A little chicanery...
-		return false !== $this->_eventManager ? call_user_func( array($this->_eventManager, 'publish'), $this, $eventName, $eventData ) : false;
+		if ( $this->_eventManager )
+		{
+			return $this->_eventManager->dispatch( $eventName, new SeedEvent( $this, $eventName, $eventData ) );
+		}
 	}
 
 	/**
@@ -230,16 +237,42 @@ class Seed implements SeedLike, PublisherLike
 	 */
 	public function on( $tag, $listener = null )
 	{
+		$_dispatcher = Kisma::getDispatcher();
+
 		//  Add our event handlers
-		if ( $this instanceof Interfaces\SubscriberLike && !empty($this->_eventManager) )
+		if ( $_dispatcher && $this instanceof SubscriberLike )
 		{
-			return call_user_func( array($this->_eventManager, 'on'),
-				$this,
-				$tag,
-				$listener );
+			$_dispatcher->addListener( $tag, $listener );
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param string        $tag
+	 * @param callable|null $listener
+	 */
+	public function off( $tag, $listener = null )
+	{
+		$_dispatcher = Kisma::getDispatcher();
+
+		//  Add our event handlers
+		if ( $_dispatcher && $this instanceof SubscriberLike )
+		{
+			if ( null === $listener )
+			{
+				$_listeners = $_dispatcher->getListeners( $tag );
+			}
+			else
+			{
+				$_listeners = array( $listener );
+			}
+
+			foreach ( $_listeners as $_listener )
+			{
+				$_dispatcher->removeListener( $tag, $_listener );
+			}
+		}
 	}
 
 	/**

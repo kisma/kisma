@@ -63,7 +63,7 @@ abstract class SeedEnum
 	{
 		$_key = static::_cacheKey( $_class = get_called_class() );
 
-		if ( $overwrite || null === ( $_constants = Option::get( $_key, static::$_constants ) ) )
+		if ( $overwrite || null === ( $_constants = Option::get( static::$_constants, $_key ) ) )
 		{
 			$_mirror = new \ReflectionClass( $_class );
 			$_constants = $_mirror->getConstants();
@@ -155,7 +155,7 @@ abstract class SeedEnum
 	}
 
 	/**
-	 * Returns true or false if this class defines a specific constant.
+	 * Returns true or false if this class defines a specific constant NAME.
 	 * Optionally returns the value of the constant, but throws an
 	 * exception if not found.
 	 *
@@ -194,9 +194,9 @@ abstract class SeedEnum
 	 * @throws \InvalidArgumentException
 	 * @return string
 	 */
-	public static function nameOf( $constant, $flipped = true, $pretty = true )
+	public static function nameOf( $constant, $flipped = true, $pretty = false )
 	{
-		$_name = $flipped ? static::defines( $constant, true ) : static::contains( $constant, true );
+		$_name = $flipped ? static::contains( $constant, true ) : static::defines( $constant, true );
 
 		return $pretty ? Inflector::display( $_name ) : $_name;
 	}
@@ -211,4 +211,5 @@ abstract class SeedEnum
 	{
 		return static::nameOf( $constant, $flipped, true );
 	}
+
 }

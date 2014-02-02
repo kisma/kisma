@@ -21,9 +21,36 @@
 namespace Kisma\Core\Enums;
 
 /**
- * KismaSettings
- * Default application-level settings defined by Kisma in ENUM format
+ * Default kernel-level settings defined by Kisma in ENUM format
  */
-class KismaSettings extends SeedEnum implements \Kisma\Core\Interfaces\KismaSettings
+class CoreSettings extends SeedEnum
 {
+	/**
+	 * @var string Set to non-empty to enable debug logging
+	 */
+	const VERBOSITY = 'app.verbosity';
+	/**
+	 * @var string The base path of the Kisma library
+	 */
+	const BASE_PATH = 'app.base_path';
+	/**
+	 * @var string The Composer autoloader object
+	 */
+	const AUTOLOADER = 'app.autoloader';
+	/**
+	 * @var string Set to TRUE once Kisma is initialized
+	 */
+	const INITIALIZED = 'app.initialized';
+	/**
+	 * @var string The version of Kisma
+	 */
+	const VERSION = 'app.version';
+	/**
+	 * @var string The detected framework, if any
+	 */
+	const DETECTED_FRAMEWORK = 'app.detected_framework';
+	/**
+	 * @var string The event dispatcher
+	 */
+	const EVENT_DISPATCHER = 'app.event_dispatcher';
 }

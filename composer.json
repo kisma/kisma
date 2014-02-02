@@ -17,7 +17,9 @@
 		}
 	],
 	"require":     {
-		"php": ">=5.3.18"
+		"php":                          ">=5.3.18",
+		"symfony/dependency-injection": "~2.4.0@stable",
+		"symfony/event-dispatcher":     "~2.4.1@stable"
 	},
 	"require-dev": {
 		"phpunit/phpunit":              "@stable",
@@ -32,7 +34,7 @@
 		"phpunit/php-invoker":          "@stable"
 	},
 	"autoload":    {
-		"psr-4": {
+		"psr-0": {
 			"Kisma\\": "src/"
 		},
 		"files": ["src/autoload.php"]

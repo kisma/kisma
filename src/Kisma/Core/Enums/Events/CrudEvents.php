@@ -21,12 +21,13 @@
 namespace Kisma\Core\Enums\Events;
 
 use Kisma\Core\Enums\SeedEnum;
+use Kisma\Core\Interfaces\EventTypeLike;
 
 /**
  * CrudEvents
  * Defines an interface for CRUD service events
  */
-class CrudEvents extends SeedEnum
+class CrudEvents extends SeedEnum implements EventTypeLike
 {
 	//*************************************************************************
 	//* Constants

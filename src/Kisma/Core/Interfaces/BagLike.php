@@ -26,7 +26,7 @@ use Kisma\Core\SeedBag;
  * BagLike
  * Something that can contain KVPs. Ya know, like a bag?
  */
-interface BagLike extends Events\SeedLike
+interface BagLike extends SeedLike
 {
 	//*************************************************************************
 	//* Methods

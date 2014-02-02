@@ -1,7 +1,9 @@
 <?php
 namespace Kisma\Core;
 
+use Kisma\Core\Enums\Events\SeedEvents;
 use Kisma\Core\Interfaces\SubscriberLike;
+use Kisma\Kisma;
 
 /**
  * SeedTest_Object
@@ -34,11 +36,22 @@ class SeedTest_Object extends Seed implements SubscriberLike
 	//*************************************************************************
 
 	/**
+	 * @param array $settings
+	 */
+	public function __construct( $settings = array() )
+	{
+		Kisma::getDispatcher()->addListener( SeedEvents::AFTER_CONSTRUCT, array( $this, 'onAfterConstruct' ) );
+		Kisma::getDispatcher()->addListener( SeedEvents::BEFORE_DESTRUCT, array( $this, 'onBeforeDestruct' ) );
+
+		parent::__construct( $settings );
+	}
+
+	/**
 	 * {@InheritDoc}
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		return $this->constructEvent = true;
+		$this->constructEvent = true;
 	}
 
 	/**

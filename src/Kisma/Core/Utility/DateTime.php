@@ -42,11 +42,11 @@ class DateTime
 	public static function prettySeconds( $seconds = 0.0 )
 	{
 		$_remain = $seconds;
-		$_hours = floor( $_remain / Enums\DateTime::SecondsPerHour );
-		$_remain -= $_hours * Enums\DateTime::SecondsPerHour;
+		$_hours = floor( $_remain / Enums\DateTime::SECONDS_PER_HOUR );
+		$_remain -= $_hours * Enums\DateTime::SECONDS_PER_HOUR;
 
-		$_minutes = floor( $_remain / Enums\DateTime::SecondsPerMinute );
-		$_remain -= $_minutes * Enums\DateTime::SecondsPerMinute;
+		$_minutes = floor( $_remain / Enums\DateTime::SECONDS_PER_MINUTE );
+		$_remain -= $_minutes * Enums\DateTime::SECONDS_PER_MINUTE;
 
 		return $_hours . 'h ' . $_minutes . 'm ' . number_format( $_remain, 2 ) . 's';
 	}

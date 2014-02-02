@@ -24,7 +24,7 @@ namespace Kisma\Core\Interfaces;
  * SeedLike
  * All seeds have this
  */
-interface SeedLike extends Events\SeedLike
+interface SeedLike
 {
 	//*************************************************************************
 	//* Public Methods

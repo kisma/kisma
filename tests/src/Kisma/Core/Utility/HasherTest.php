@@ -19,6 +19,8 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Kisma;
+
 /**
  * HasherTest
  * Tests methods in the Hasher class
@@ -30,7 +32,7 @@ class HasherTest extends \PHPUnit_Framework_TestCase
 
 	public function testGenerateUnique()
 	{
-		\Kisma::set( 'debug.kisma.core.utility.hasher::generate_unique', true );
+		Kisma::set( 'debug.kisma.core.utility.hasher::generate_unique', true );
 
 		$_hash1 = Hasher::generateUnique();
 		$_hash2 = Hasher::generateUnique( 'someemailaddress@somewhere.com' );

@@ -21,6 +21,7 @@
 namespace Kisma\Core\Utility;
 
 use Kisma\Core\Enums\HttpMethod;
+use Kisma\Kisma;
 
 /**
  * Curl
@@ -55,13 +56,14 @@ class Curl extends HttpMethod
 	/**
 	 * @var array Default cURL options
 	 */
-	protected static $_curlOptions = array(
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_HEADER         => true,
-		CURLINFO_HEADER_OUT    => true,
-		CURLOPT_SSL_VERIFYPEER => false,
-	);
+	protected static $_curlOptions
+		= array(
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HEADER         => true,
+			CURLINFO_HEADER_OUT    => true,
+			CURLOPT_SSL_VERIFYPEER => false,
+		);
 	/**
 	 * @var int The last http code
 	 */
@@ -289,6 +291,7 @@ class Curl extends HttpMethod
 				break;
 
 			case static::Merge:
+				//	Fall through
 			case static::Delete:
 				/** Merge && Delete have payloads, but they and Options/Copy need CURLOPT_CUSTOMREQUEST set so just fall through... */
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
@@ -650,14 +653,14 @@ class Curl extends HttpMethod
 			$_port = null;
 		}
 
-		$_currentUrl =
-			$_protocol .
+		$_currentUrl
+			= $_protocol .
 			$_host .
 			$_port .
 			( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
 			( true === $includeQuery ? $_query : null );
 
-		if ( \Kisma::get( 'debug.curl.current_url' ) )
+		if ( Kisma::get( 'debug.curl.current_url' ) )
 		{
 			Log::debug( 'Parsed current URL to be: ' . $_currentUrl, $_parts );
 		}

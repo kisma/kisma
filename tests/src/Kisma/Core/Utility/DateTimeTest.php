@@ -20,13 +20,13 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
 	public function testPrettySeconds()
 	{
 		$this->assertEquals(
-			'1h 0m 0.00s',
-			DateTime::prettySeconds( Enums\DateTime::SecondsPerHour )
+			 '1h 0m 0.00s',
+			 DateTime::prettySeconds( Enums\DateTime::SECONDS_PER_HOUR )
 		);
 
 		$this->assertEquals(
-			'5h 37m 25.12s',
-			DateTime::prettySeconds( 20245.12 )
+			 '5h 37m 25.12s',
+			 DateTime::prettySeconds( 20245.12 )
 		);
 
 	}

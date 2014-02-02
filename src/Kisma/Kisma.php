@@ -20,26 +20,19 @@
  */
 namespace Kisma;
 
-use Kisma\Core\Interfaces\KismaSettings;
+use Kisma\Core\Enums\CoreSettings;
+use Kisma\Core\Enums\Events\LifeEvents;
 use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Utility\Detector;
-use Kisma\Core\Utility\EventManager;
-use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Utility\Option;
-use Kisma\Core\Utility\Scalar;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Kisma
  * Contains a few core functions implemented statically to be lightweight and single instance.
- *
- * @method static bool getConception() Gets the conception flag
- * @method static bool setConception(bool $how) Sets the conception flag
- * @method static mixed getDebug() Gets the debug setting(s)
- * @method static mixed setDebug(mixed $how) Sets the debug setting(s)
- * @method static \Composer\Autoload\ClassLoader getAutoLoader()
- * @method static mixed setAutoLoader(mixed $autoLoader)
  */
-class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, KismaSettings
+class Kisma implements PublisherLike, EventSubscriberInterface
 {
 	//*************************************************************************
 	//* Constants
@@ -48,7 +41,11 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	/**
 	 * @var string The current version
 	 */
-	const KismaVersion = '0.2.13';
+	const VERSION = '0.3.x-dev';
+	/**
+	 * @const string The tag for saving options
+	 */
+	const OPTIONS = 'kisma.options';
 
 	//*************************************************************************
 	//* Members
@@ -56,14 +53,17 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 
 	/**
 	 * @var array The library configuration options
+	 *            Container
 	 */
-	protected static $_options = array(self::BasePath   => __DIR__,
-									   self::AutoLoader => null,
-									   self::Conception => false,
-									   self::Version    => self::KismaVersion,
-									   self::Name       => 'App',
-									   self::NavBar     => null,
-									   self::Framework  => null,);
+	protected static $_options
+		= array(
+			CoreSettings::BASE_PATH          => __DIR__,
+			CoreSettings::AUTOLOADER         => null,
+			CoreSettings::INITIALIZED        => false,
+			CoreSettings::VERSION            => self::VERSION,
+			CoreSettings::DETECTED_FRAMEWORK => null,
+			CoreSettings::EVENT_DISPATCHER   => null,
+		);
 
 	//**************************************************************************
 	//* Methods
@@ -91,27 +91,30 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 		static::$_options = Option::merge( static::$_options, $options );
 
 		//	Register our faux-destructor
-		if ( false === ($_conceived = static::getConception()) )
+		if ( false === ( $_conceived = static::$_options[CoreSettings::INITIALIZED] ) )
 		{
-			\register_shutdown_function( function ( $eventName = Kisma::Death )
+			\register_shutdown_function(
+				function ( $type = LifeEvents::DEATH )
 				{
-					\Kisma::__sleep();
-					EventManager::publish( null, $eventName );
-				} );
+					Kisma::__sleep();
+					Kisma::getDispatcher()->dispatch( $type );
+				}
+			);
 
 			//	Try and detect the framework being used...
-			Detector::framework();
+			static::$_options[CoreSettings::DETECTED_FRAMEWORK] = Detector::framework();
 
-			//	We done baby!
-			static::setConception( true );
+			//	We done baby! Set this now to escape autoloader recursion hell
+			static::$_options[CoreSettings::INITIALIZED] = $_conceived = true;
 
-			if ( null === static::getAutoLoader() && class_exists( '\\ComposerAutoloaderInit', false ) )
+			//	If the composer autoloader has been started, get it...
+			if ( !isset( static::$_options[CoreSettings::AUTOLOADER] ) && class_exists( '\\ComposerAutoloaderInit', false ) )
 			{
-				static::setAutoLoader( \ComposerAutoloaderInit::getLoader() );
+				static::$_options[CoreSettings::AUTOLOADER] = \ComposerAutoloaderInit::getLoader();
 			}
 
 			//	And let the world know we're alive
-			EventManager::publish( null, Kisma::Birth );
+			static::getDispatcher()->dispatch( LifeEvents::BIRTH );
 		}
 
 		return $_conceived;
@@ -123,9 +126,9 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __sleep()
 	{
 		//	Save options out to session...
-		if ( isset($_SESSION) )
+		if ( isset( $_SESSION ) )
 		{
-			$_SESSION['kisma.options'] = static::$_options;
+			$_SESSION[static::OPTIONS] = static::$_options;
 		}
 	}
 
@@ -135,11 +138,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __wakeup()
 	{
 		//	Load options from session...
-		if ( isset($_SESSION, $_SESSION['kisma.options']) )
+		if ( isset( $_SESSION, $_SESSION[static::OPTIONS] ) )
 		{
 			//	Merge them into the fold
-			static::$_options = array_merge( $_SESSION['kisma.options'],
-				static::$_options );
+			static::$_options = array_merge(
+				$_SESSION[static::OPTIONS],
+				static::$_options
+			);
 		}
 	}
 
@@ -195,37 +200,11 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	}
 
 	/**
-	 * An easy way to get Kisma settings out of the bag
-	 *
-	 * @param string $name
-	 * @param array  $arguments
-	 *
-	 * @throws \BadMethodCallException
-	 * @return mixed
-	 */
-	public static function __callStatic( $name, $arguments )
-	{
-		if ( Scalar::in( $_type = strtolower( substr( $name, 0, 3 ) ), 'get', 'set' ) )
-		{
-			$_tag = 'app.' . Inflector::tag( substr( $name, 3 ), true );
-
-			if ( \Kisma\Core\Enums\KismaSettings::contains( $_tag ) )
-			{
-				array_unshift( $arguments, $_tag );
-
-				return call_user_func_array( array(__CLASS__, $_type), $arguments );
-			}
-		}
-
-		throw new \BadMethodCallException('The method "' . $name . '" does not exist, or at least, I can\'t find it.');
-	}
-
-	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * @param \Kisma\SeedEvent $event
 	 *
 	 * @return bool
 	 */
-	public static function onBirth( $event = null )
+	public static function onBirth( SeedEvent $event )
 	{
 		static::__wakeup();
 
@@ -237,7 +216,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	 *
 	 * @return bool
 	 */
-	public static function onDeath( $event = null )
+	public static function onDeath( $event )
 	{
 		static::__sleep();
 
@@ -245,18 +224,51 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	}
 
 	/**
-	 * @param Composer\Script\Event $event
+	 * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
 	 */
-	public static function postInstall( \Composer\Script\Event $event )
+	public static function setDispatcher( $dispatcher )
 	{
-		//	Nada
+		static::set( CoreSettings::EVENT_DISPATCHER, $dispatcher );
 	}
 
 	/**
-	 * @param Composer\Script\Event $event
+	 * @return \Symfony\Component\EventDispatcher\EventDispatcher
 	 */
-	public static function postUpdate( \Composer\Script\Event $event )
+	public static function getDispatcher()
 	{
-		//	Nada
+		if ( null === ( $_dispatcher = static::get( CoreSettings::EVENT_DISPATCHER ) ) )
+		{
+			static::setDispatcher( $_dispatcher = new EventDispatcher() );
+		}
+
+		return $_dispatcher;
+	}
+
+	/**
+	 * Returns an array of event names this subscriber wants to listen to.
+	 *
+	 * The array keys are event names and the value can be:
+	 *
+	 *  * The method name to call (priority defaults to 0)
+	 *  * An array composed of the method name to call and the priority
+	 *  * An array of arrays composed of the method names to call and respective
+	 *    priorities, or 0 if unset
+	 *
+	 * For instance:
+	 *
+	 *  * array('eventName' => 'methodName')
+	 *  * array('eventName' => array('methodName', $priority))
+	 *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+	 *
+	 * @return array The event names to listen to
+	 *
+	 * @api
+	 */
+	public static function getSubscribedEvents()
+	{
+		return array(
+			LifeEvents::BIRTH => 'onBirth',
+			LifeEvents::DEATH => 'onDeath'
+		);
 	}
 }

@@ -21,10 +21,10 @@
 namespace Kisma\Core\Interfaces;
 
 /**
- * KismaSettings
+ * CoreSettings
  * Default application-level settings defined by Kisma
  */
-interface KismaSettings
+interface CoreSettings
 {
 	//*************************************************************************
 	//* Constants

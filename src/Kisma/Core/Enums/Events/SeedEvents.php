@@ -21,12 +21,12 @@
 namespace Kisma\Core\Enums\Events;
 
 use Kisma\Core\Enums\SeedEnum;
+use Kisma\Core\Interfaces\EventTypeLike;
 
 /**
- * SeedEvents
  * Defines the events for all seeds
  */
-class SeedEvents extends SeedEnum
+class SeedEvents extends SeedEnum implements EventTypeLike
 {
 	//*************************************************************************
 	//* Constants

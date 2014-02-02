@@ -20,6 +20,8 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Kisma;
+
 /**
  * Renderer
  * View renderer for Twig
@@ -104,24 +106,24 @@ class Render
 	{
 		$additional = array_merge(
 			$additional,
-			\Kisma::get( 'view.defaults', array() )
+			Kisma::get( 'view.defaults', array() )
 		);
 
 		if ( null !== $viewFile )
 		{
 			$additional = array_merge(
 				$additional,
-				\Kisma::get( 'view.config.' . $viewFile, array() )
+				Kisma::get( 'view.config.' . $viewFile, array() )
 			);
 		}
 
 		$_payload = array(
-			'app_name'    => \Kisma::get( 'app.name' ),
-			'app_root'    => \Kisma::get( 'app.root' ),
-			'app_version' => \Kisma::get( 'app.version' ),
+			'app_name'    => Kisma::get( 'app.name' ),
+			'app_root'    => Kisma::get( 'app.root' ),
+			'app_version' => Kisma::get( 'app.version' ),
 			'page_date'   => date( 'Y-m-d H:i:s' ),
-			'vendor_path' => \Kisma::get( 'app.base_path' ) . '/vendor',
-			'navbar'      => \Kisma::get( 'app.navbar' ),
+			'vendor_path' => Kisma::get( 'app.base_path' ) . '/vendor',
+			'navbar'      => Kisma::get( 'app.navbar' ),
 		);
 
 		return array_merge( $_payload, $additional );

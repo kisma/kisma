@@ -20,41 +20,65 @@
  */
 namespace Kisma\Core\Events;
 
+use Kisma\Core\Interfaces\PublisherLike;
+use Kisma\Core\Interfaces\SeedLike;
+use Kisma\Core\Interfaces\SubscriberLike;
+use Kisma\Core\Utility\Inflector;
+use Symfony\Component\EventDispatcher\Event;
+
 /**
- * SeedEvent
- * The base class for Kisma events
+ * The base event class for Kisma
  *
  * It encapsulates the parameters associated with an event.
- * The {@link source} property describes who raised the event.
+ * This object is modeled after jQuery's event object.
  *
- * If an event handler calls the kill() method, propagation will halt.
+ * If an event handler calls an event's stopPropagation() method, no further
+ * listeners will be called.
+ *
+ * @author Jerry Ablan <jerryablan@gmail.com>
  */
-class SeedEvent
+class SeedEvent extends Event implements SeedLike
 {
 	//**************************************************************************
 	//* Members
 	//**************************************************************************
 
 	/**
-	 * @var \Kisma\Core\Interfaces\SeedLike The source of this event
+	 * @var string The type of event, or event name
 	 */
-	protected $_source;
+	protected $_type = null;
 	/**
-	 * @var boolean Set to true to stop the bubbling of events at any point
+	 * @var mixed An optional object of data passed to an event handler
 	 */
-	protected $_kill = false;
+	protected $_data = null;
 	/**
-	 * @var mixed Any event data the sender wants to convey
+	 * @var bool Set to true to stop the default action from being performed
 	 */
-	protected $_data;
+	protected $_defaultPrevented = false;
 	/**
-	 * @var string
+	 * @var bool Set to true to stop the bubbling of events at any point
 	 */
-	protected $_eventTag = null;
+	protected $_propagationStopped = false;
+	/**
+	 * @var mixed The last value returned by an event handler that was triggered by this event, unless the value was null.
+	 */
+	protected $_result = null;
+	/**
+	 * @var int The time of the event. Unix timestamp returned from time()
+	 */
+	protected $_timestamp = null;
+	/**
+	 * @var PublisherLike The object that published this event (jQuery's event.target)
+	 */
+	protected $_publisher = null;
+	/**
+	 * @var SubscriberLike The current subscriber in the listener chain (jQuery's event.currentTarget)
+	 */
+	protected $_currentSubscriber = null;
 	/**
 	 * @var string A user-defined event ID
 	 */
-	protected $_eventId = null;
+	protected $_id = null;
 
 	//**************************************************************************
 	//* Methods
@@ -63,34 +87,55 @@ class SeedEvent
 	/**
 	 * Constructor.
 	 *
-	 * @param \Kisma\Core\Interfaces\SeedLike $source
-	 * @param mixed                           $data
+	 * @param \Kisma\Core\Interfaces\PublisherLike $publisher
+	 * @param string                               $type
+	 * @param mixed                                $data
+	 *
+	 * @internal param string $type
+	 * @internal param \Kisma\Core\Interfaces\SeedLike $source
 	 */
-	public function __construct( $source = null, $data = null )
+	public function __construct( PublisherLike $publisher, $type, $data = null )
 	{
-		$this->_source = $source;
+		$this->_id = spl_object_hash( $this );
+		$this->_publisher = $publisher;
 		$this->_data = $data;
-		$this->_kill = false;
+		$this->_timestamp = time();
 	}
 
 	/**
-	 * Kills propagation immediately
-	 *
-	 * @return SeedEvent
+	 * Tells the event manager to prevent the default action from being performed
 	 */
-	public function kill()
+	public function preventDefault()
 	{
-		$this->_kill = true;
-
-		return $this;
+		$this->_defaultPrevented = true;
 	}
 
 	/**
 	 * @return bool
 	 */
-	public function wasKilled()
+	public function isDefaultPrevented()
 	{
-		return ( false !== $this->_kill );
+		return $this->_defaultPrevented;
+	}
+
+	/**
+	 * @param \Kisma\Core\Interfaces\SubscriberLike $currentSubscriber
+	 *
+	 * @return SeedEvent
+	 */
+	public function setCurrentSubscriber( $currentSubscriber )
+	{
+		$this->_currentSubscriber = $currentSubscriber;
+
+		return $this;
+	}
+
+	/**
+	 * @return \Kisma\Core\Interfaces\SubscriberLike
+	 */
+	public function getCurrentSubscriber()
+	{
+		return $this->_currentSubscriber;
 	}
 
 	/**
@@ -114,33 +159,13 @@ class SeedEvent
 	}
 
 	/**
-	 * @param \Kisma\Core\Interfaces\SeedLike $source
+	 * @param string $id
 	 *
 	 * @return SeedEvent
 	 */
-	public function setSource( $source )
+	public function setId( $id )
 	{
-		$this->_source = $source;
-
-		return $this;
-	}
-
-	/**
-	 * @return \Kisma\Core\Interfaces\SeedLike
-	 */
-	public function getSource()
-	{
-		return $this->_source;
-	}
-
-	/**
-	 * @param string $eventId
-	 *
-	 * @return SeedEvent
-	 */
-	public function setEventId( $eventId )
-	{
-		$this->_eventId = $eventId;
+		$this->_id = $id;
 
 		return $this;
 	}
@@ -148,28 +173,56 @@ class SeedEvent
 	/**
 	 * @return string
 	 */
-	public function getEventId()
+	public function getId()
 	{
-		return $this->_eventId;
+		return $this->_id;
 	}
 
 	/**
-	 * @param string $eventTag
-	 *
-	 * @return SeedEvent
+	 * @return \Kisma\Core\Interfaces\PublisherLike
 	 */
-	public function setEventTag( $eventTag )
+	public function getPublisher()
 	{
-		$this->_eventTag = $eventTag;
+		return $this->_publisher;
+	}
 
-		return $this;
+	/**
+	 * @return mixed
+	 */
+	public function getResult()
+	{
+		return $this->_result;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getTimestamp()
+	{
+		return $this->_timestamp;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getEventTag()
+	public function getType()
 	{
-		return $this->_eventTag;
+		return $this->_type;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTag()
+	{
+		return Inflector::neutralize( $this->_type );
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->_type;
 	}
 }

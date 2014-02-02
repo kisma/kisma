@@ -20,9 +20,12 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Enums\CoreSettings;
+use Kisma\Core\Enums\Verbosity;
 use Kisma\Core\Interfaces\Levels;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
+use Kisma\Kisma;
 
 /**
  * Log
@@ -58,10 +61,11 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var array The strings to watch for at the beginning of a log line to control the indenting
 	 */
-	protected static $_indentTokens = array(
-		true  => '<*',
-		false => '*>',
-	);
+	protected static $_indentTokens
+		= array(
+			true  => '<*',
+			false => '*>',
+		);
 	/**
 	 * @var string
 	 */
@@ -93,14 +97,14 @@ class Log extends Seed implements UtilityLike, Levels
 		//	If we're not debugging, don't log debug statements
 		if ( static::Debug == $level )
 		{
-			$_debug = \Kisma::getDebug();
+			$_debug = Kisma::get( CoreSettings::VERBOSITY );
 
 			if ( is_callable( $_debug ) )
 			{
 				$_debug = call_user_func( $_debug, $message, $level, $context, $extra, $tag );
 			}
 
-			if ( false === $_debug )
+			if ( Verbosity::DEBUG != $_debug )
 			{
 				return true;
 			}
@@ -140,13 +144,13 @@ class Log extends Seed implements UtilityLike, Levels
 		$_levelName = static::_getLogLevel( $level );
 
 		$_entry = static::formatLogEntry(
-			array(
-				'level'     => $_levelName,
-				'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
-				'timestamp' => $_timestamp,
-				'context'   => $context,
-				'extra'     => $extra,
-			)
+						array(
+							'level'     => $_levelName,
+							'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+							'timestamp' => $_timestamp,
+							'context'   => $context,
+							'extra'     => $extra,
+						)
 		);
 
 		if ( static::$_logFileValid || is_numeric( static::$_defaultLog ) )
@@ -426,7 +430,7 @@ class Log extends Seed implements UtilityLike, Levels
 		//	Set a name for the default log
 		if ( null === static::$_defaultLog )
 		{
-			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : getcwd();
+			$_logPath = Kisma::get( 'app.log_path', Kisma::get( 'app.base_path' ) ) ? : getcwd();
 			static::$_defaultLog = $_logPath . static::DefaultLogFile;
 		}
 		else

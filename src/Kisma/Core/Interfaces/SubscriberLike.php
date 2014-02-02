@@ -21,9 +21,8 @@
 namespace Kisma\Core\Interfaces;
 
 /**
- * SubscriberLike
- * Acts like it wants to subscribe to events
+ * Something that gets events
  */
-interface SubscriberLike extends SeedLike
+interface SubscriberLike
 {
 }

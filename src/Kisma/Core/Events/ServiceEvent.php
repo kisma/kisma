@@ -20,14 +20,12 @@
  */
 namespace Kisma\Core\Events;
 
-use Kisma\Core\Interfaces\ConsumerLike;
+use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Interfaces\RequestLike;
 
 /**
  * ServiceEvent
- * An event that is consumed by a service. Merely enforces the $request argument
- *
- * @method ConsumerLike getSource()
+ * An event that is consumed by a service. Merely enforces that the $data is "RequestLike"
  */
 class ServiceEvent extends SeedEvent
 {
@@ -38,11 +36,14 @@ class ServiceEvent extends SeedEvent
 	/**
 	 * Enforces types...
 	 *
-	 * @param ConsumerLike $source
-	 * @param RequestLike  $request
+	 * @param \Kisma\Core\Interfaces\PublisherLike $publisher
+	 * @param string                               $type
+	 * @param RequestLike                          $request
+	 *
+	 * @internal param \Kisma\Core\Interfaces\PublisherLike $source
 	 */
-	public function __construct( ConsumerLike $source, RequestLike $request = null )
+	public function __construct( PublisherLike $publisher, $type, RequestLike $request = null )
 	{
-		parent::__construct( $source, $request );
+		parent::__construct( $publisher, $type, $request );
 	}
 }

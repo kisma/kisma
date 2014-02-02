@@ -20,11 +20,14 @@
  */
 namespace Kisma\Core\Enums\Events;
 
+use Kisma\Core\Enums\SeedEnum;
+use Kisma\Core\Interfaces\EventTypeLike;
+
 /**
  * LifeEvents
  * The kernel-level events
  */
-interface LifeEvents
+class LifeEvents extends SeedEnum implements EventTypeLike
 {
 	//*************************************************************************
 	//* Constants

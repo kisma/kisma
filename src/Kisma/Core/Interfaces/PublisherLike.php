@@ -21,10 +21,9 @@
 namespace Kisma\Core\Interfaces;
 
 /**
- * PublisherLike
  * Defines an object as being a publisher of things
  */
-interface PublisherLike extends Events\PublisherLike
+interface PublisherLike
 {
 	//*************************************************************************
 	//* Constants
@@ -33,5 +32,5 @@ interface PublisherLike extends Events\PublisherLike
 	/**
 	 * @var string The default event manager for an object
 	 */
-	const DefaultEventManager = '\\Kisma\\Core\\Utility\\EventManager';
+	const DEFAULT_EVENT_MANAGER = 'Kisma\\Core\\Utility\\EventManager';
 }

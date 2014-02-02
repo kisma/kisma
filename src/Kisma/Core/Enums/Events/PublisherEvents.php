@@ -18,12 +18,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Enums\Events;
+
+use Kisma\Core\Enums\SeedEnum;
+use Kisma\Core\Interfaces\EventTypeLike;
 
 /**
- * PhpFrameworks
- * Various PHP frameworks used by the Detector!
+ * Events for publishers
  */
-interface PhpFrameworks
+class PublisherEvents extends SeedEnum implements EventTypeLike
 {
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	/**
+	 * @var string
+	 */
+	const BEFORE_PUBLISH = 'kisma.core.publisher.before_publish';
+	/**
+	 * @var string
+	 */
+	const PROPAGATION_STOPPED = 'kisma.core.publisher.propagation_stopped';
+	/**
+	 * @var string
+	 */
+	const AFTER_PUBLISH = 'kisma.core.publisher.after_publish';
 }

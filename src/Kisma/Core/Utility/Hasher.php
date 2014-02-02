@@ -20,357 +20,18 @@
  */
 namespace Kisma\Core\Utility;
 
-use Kisma\Core\Interfaces\HashSeed;
+use Kisma\Core\Enums\HashSeed;
 use Kisma\Core\Interfaces\HashType;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
+use Kisma\Kisma;
 
 /**
  * Hasher
  * Hashing utility class
  */
-class Hasher extends Seed implements UtilityLike, HashSeed, HashType
+class Hasher extends Seed implements UtilityLike, HashType
 {
-	//*************************************************************************
-	//	Constants
-	//*************************************************************************
-
-	/**
-	 * @var int The maximum default length for unique hash generations
-	 */
-	const MAX_HASH_LENGTH = 128;
-
-	//********************************************************************************
-	//* Private Members
-	//********************************************************************************
-
-	/**
-	 * @var array The various hash seeds used by this class
-	 */
-	protected static $_hashSeeds = array(
-		self::All                         => array(
-			'a',
-			'b',
-			'c',
-			'd',
-			'e',
-			'f',
-			'g',
-			'h',
-			'i',
-			'j',
-			'k',
-			'l',
-			'm',
-			'n',
-			'o',
-			'p',
-			'q',
-			'r',
-			's',
-			't',
-			'u',
-			'v',
-			'w',
-			'x',
-			'y',
-			'z',
-			'A',
-			'B',
-			'C',
-			'D',
-			'E',
-			'F',
-			'G',
-			'H',
-			'I',
-			'J',
-			'K',
-			'L',
-			'M',
-			'N',
-			'O',
-			'P',
-			'Q',
-			'R',
-			'S',
-			'T',
-			'U',
-			'V',
-			'W',
-			'X',
-			'Y',
-			'Z',
-			'0',
-			'1',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9'
-		),
-		self::AlphaLower                  => array(
-			'a',
-			'b',
-			'c',
-			'd',
-			'e',
-			'f',
-			'g',
-			'h',
-			'i',
-			'j',
-			'k',
-			'l',
-			'm',
-			'n',
-			'o',
-			'p',
-			'q',
-			'r',
-			's',
-			't',
-			'u',
-			'v',
-			'w',
-			'x',
-			'y',
-			'z'
-		),
-		self::AlphaUpper                  => array(
-			'A',
-			'B',
-			'C',
-			'D',
-			'E',
-			'F',
-			'G',
-			'H',
-			'I',
-			'J',
-			'K',
-			'L',
-			'M',
-			'N',
-			'O',
-			'P',
-			'Q',
-			'R',
-			'S',
-			'T',
-			'U',
-			'V',
-			'W',
-			'X',
-			'Y',
-			'Z'
-		),
-		self::Alpha                       => array(
-			'A',
-			'B',
-			'C',
-			'D',
-			'E',
-			'F',
-			'G',
-			'H',
-			'I',
-			'J',
-			'K',
-			'L',
-			'M',
-			'N',
-			'O',
-			'P',
-			'Q',
-			'R',
-			'S',
-			'T',
-			'U',
-			'V',
-			'W',
-			'X',
-			'Y',
-			'Z',
-			'a',
-			'b',
-			'c',
-			'd',
-			'e',
-			'f',
-			'g',
-			'h',
-			'i',
-			'j',
-			'k',
-			'l',
-			'm',
-			'n',
-			'o',
-			'p',
-			'q',
-			'r',
-			's',
-			't',
-			'u',
-			'v',
-			'w',
-			'x',
-			'y',
-			'z'
-		),
-		self::AlphaNumeric                => array(
-			'A',
-			'B',
-			'C',
-			'D',
-			'E',
-			'F',
-			'G',
-			'H',
-			'I',
-			'J',
-			'K',
-			'L',
-			'M',
-			'N',
-			'O',
-			'P',
-			'Q',
-			'R',
-			'S',
-			'T',
-			'U',
-			'V',
-			'W',
-			'X',
-			'Y',
-			'Z',
-			'a',
-			'b',
-			'c',
-			'd',
-			'e',
-			'f',
-			'g',
-			'h',
-			'i',
-			'j',
-			'k',
-			'l',
-			'm',
-			'n',
-			'o',
-			'p',
-			'q',
-			'r',
-			's',
-			't',
-			'u',
-			'v',
-			'w',
-			'x',
-			'y',
-			'z',
-			'0',
-			'1',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9'
-		),
-		self::AlphaLowerNumeric           => array(
-			'a',
-			'b',
-			'c',
-			'd',
-			'e',
-			'f',
-			'g',
-			'h',
-			'i',
-			'j',
-			'k',
-			'l',
-			'm',
-			'n',
-			'o',
-			'p',
-			'q',
-			'r',
-			's',
-			't',
-			'u',
-			'v',
-			'w',
-			'x',
-			'y',
-			'z',
-			'0',
-			'1',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9'
-		),
-		self::Numeric                     => array(
-			'0',
-			'1',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9'
-		),
-		self::AlphaLowerNumericIdiotProof => array(
-			'a',
-			'b',
-			'c',
-			'd',
-			'e',
-			'f',
-			'g',
-			'h',
-			'j',
-			'k',
-			'm',
-			'n',
-			'p',
-			'q',
-			'r',
-			's',
-			't',
-			'u',
-			'v',
-			'w',
-			'x',
-			'y',
-			'z',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9'
-		),
-	);
-
 	//********************************************************************************
 	//* Methods
 	//********************************************************************************
@@ -394,18 +55,22 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *
 	 * @return string
 	 */
-	public static function generate( $hashLength = self::MAX_HASH_LENGTH, $hashSeed = self::All )
+	public static function generate( $hashLength = HashSeed::MAX_HASH_LENGTH, $hashSeed = HashSeed::ALL )
 	{
 		//	If we ain't got what you're looking for, return simple md5 hash...
-		if ( !isset( self::$_hashSeeds, self::$_hashSeeds[$hashSeed] ) || !is_array( self::$_hashSeeds[$hashSeed] ) )
+		try
+		{
+			$_seeds = HashSeed::getSeed( $hashSeed );
+		}
+		catch ( \Exception $_ex )
 		{
 			return md5( time() . mt_rand() . time() );
 		}
 
 		//	Randomly pick elements from the array of seeds
-		for ( $_i = 0, $_hash = null, $_size = count( self::$_hashSeeds[$hashSeed] ) - 1; $_i < $hashLength; $_i++ )
+		for ( $_i = 0, $_hash = null, $_size = count( $_seeds ) - 1; $_i < $hashLength; $_i++ )
 		{
-			$_hash .= self::$_hashSeeds[$hashSeed][mt_rand( 0, $_size )];
+			$_hash .= $_seeds[mt_rand( 0, $_size )];
 		}
 
 		return $_hash;
@@ -420,26 +85,26 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *
 	 * @return string
 	 */
-	public static function generateUnique( $seed = null, $length = self::MAX_HASH_LENGTH, $algorithm = 'sha512' )
+	public static function generateUnique( $seed = null, $length = HashSeed::MAX_HASH_LENGTH, $algorithm = 'sha512' )
 	{
 		static $_debug = null;
 
 		if ( null === $_debug )
 		{
 			$_tag = Inflector::neutralize( __METHOD__ );
-			$_debug = \Kisma::get( 'debug.' . $_tag, false );
+			$_debug = Kisma::get( 'debug.' . $_tag, false );
 			Log::debug( 'Debug flag in "' . 'debug.' . $_tag . '": ' . ( $_debug ? 'ON' : 'OFF' ) );
 		}
 
 		if ( $_debug )
 		{
 			Log::debug(
-				' >> Hasher::generateUnique() called',
-				array(
-					'seed'      => ( null === $seed ? 'NULL' : $seed ),
-					'length'    => $length,
-					'algorithm' => $algorithm
-				)
+			   ' >> Hasher::generateUnique() called',
+			   array(
+				   'seed'      => ( null === $seed ? 'NULL' : $seed ),
+				   'length'    => $length,
+				   'algorithm' => $algorithm
+			   )
 			);
 		}
 
@@ -468,8 +133,8 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 		if ( $_debug )
 		{
 			Log::debug(
-				'  Random-ish seed created: ' . $_seed,
-				array( 'seed' => ( null === $seed ? 'NULL' : $seed ), 'length' => $length, 'algorithm' => $algorithm )
+			   '  Random-ish seed created: ' . $_seed,
+			   array( 'seed' => ( null === $seed ? 'NULL' : $seed ), 'length' => $length, 'algorithm' => $algorithm )
 			);
 		}
 
@@ -478,7 +143,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 		if ( $_debug )
 		{
 			Log::debug(
-				'<< Hash generated: ' . $_hash
+			   '<< Hash generated: ' . $_hash
 			);
 		}
 
@@ -501,7 +166,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *
 	 * @return string
 	 */
-	public static function hash( $hashTarget = null, $hashType = self::SHA1, $hashLength = self::MAX_HASH_LENGTH, $rawOutput = false )
+	public static function hash( $hashTarget = null, $hashType = self::SHA1, $hashLength = HashSeed::MAX_HASH_LENGTH, $rawOutput = false )
 	{
 		$_value = ( null === $hashTarget ) ? self::generate( $hashLength ) : $hashTarget;
 

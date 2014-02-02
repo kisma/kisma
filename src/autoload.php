@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
+use Kisma\Kisma;
 
 /**
  * autoload.php
  * Bootstrap loader for Kisma
  */
 //	Initialize
-\Kisma::conceive();
+Kisma::conceive();

@@ -24,7 +24,7 @@ namespace Kisma\Core\Enums;
  * PhpFrameworks
  * Various PHP frameworks used by the Detector!
  */
-class PhpFrameworks extends SeedEnum implements \Kisma\Core\Interfaces\PhpFrameworks
+class PhpFrameworks extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -33,45 +33,45 @@ class PhpFrameworks extends SeedEnum implements \Kisma\Core\Interfaces\PhpFramew
 	/**
 	 * @var string
 	 */
-	const CakePhp = 'cake_php';
+	const CAKE_PHP = 'cake_php';
 	/**
 	 * @var string
 	 */
-	const CodeIgniter = 'code_igniter';
+	const CODE_IGNITER = 'code_igniter';
 	/**
 	 * @var string
 	 */
-	const Drupal = 'drupal';
+	const DRUPAL = 'drupal';
 	/**
 	 * @var string
 	 */
-	const Joomla = 'joomla';
+	const JOOMLA = 'joomla';
 	/**
 	 * @var string
 	 */
-	const WordPress = 'word_press';
+	const WORDPRESS = 'wordpress';
 	/**
 	 * @var string
 	 */
-	const FuelPhp = 'fuel_php';
+	const FUEL_PHP = 'fuel_php';
 	/**
 	 * @var string
 	 */
-	const Laravel = 'laravel';
+	const LARAVEL = 'laravel';
 	/**
 	 * @var string
 	 */
-	const Silex = 'silex';
+	const SILEX = 'silex';
 	/**
 	 * @var string
 	 */
-	const Symfony = 'symfony';
+	const SYMFONY = 'symfony';
 	/**
 	 * @var string
 	 */
-	const Yii = 'yii';
+	const YII = 'yii';
 	/**
 	 * @var string
 	 */
-	const ZendFramework = 'zend_framework';
+	const ZEND_FRAMEWORK = 'zend_framework';
 }

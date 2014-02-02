@@ -20,13 +20,14 @@
  */
 namespace Kisma\Core\Utility;
 
-use Kisma\Core\Interfaces\PhpFrameworks;
+use Kisma\Core\Enums\PhpFrameworks;
+use Kisma\Kisma;
 
 /**
  * Detector
  * Provides detection services for various things
  */
-class Detector implements PhpFrameworks
+class Detector
 {
 	//*************************************************************************
 	//* Methods
@@ -37,28 +38,28 @@ class Detector implements PhpFrameworks
 	 * Subclass and add a YourClass::sniff_[framework]() method.
 	 *
 	 * @param string $path
+	 *
+	 * @return string
 	 */
 	public static function framework( $path = null )
 	{
-		foreach ( \Kisma\Core\Enums\PhpFrameworks::getDefinedConstants() as $_constant => $_value )
+		$_thisClass = get_called_class();
+
+		foreach ( PhpFrameworks::getConstList() as $_constant => $_value )
 		{
-			$_thisClass = get_called_class();
 			$_method = 'sniff_' . $_value;
 
 			if ( method_exists( $_thisClass, $_method ) && call_user_func( array( $_thisClass, $_method ) ) )
 			{
-				\Kisma::set( 'app.framework', $_value );
-//				Log::debug( 'PHP framework detected: ' . $_constant . ' (' . $_value . ')' );
-
 				switch ( $_constant )
 				{
-					case \Kisma\Core\Enums\PhpFrameworks::Yii:
+					case PhpFrameworks::YII:
 						/**
 						 * Pull in all the parameters from the Yii app into the bag...
 						 */
 						foreach ( \Yii::app()->getParams()->toArray() as $_parameterName => $_parameterValue )
 						{
-							\Kisma::set( $_parameterName, $_parameterValue );
+							Kisma::set( 'yii.' . $_parameterName, $_parameterValue );
 						}
 						break;
 				}
@@ -66,6 +67,8 @@ class Detector implements PhpFrameworks
 				return $_value;
 			}
 		}
+
+		return null;
 	}
 
 	/**

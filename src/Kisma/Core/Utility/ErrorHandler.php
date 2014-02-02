@@ -20,6 +20,8 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Kisma;
+
 /**
  * ErrorHandler
  * A dead-simple error handler class
@@ -169,19 +171,19 @@ class ErrorHandler
 	{
 		try
 		{
-			$_errorTemplate = \Kisma::get( 'app.error_template', '_error.twig' );
+			$_errorTemplate = Kisma::get( 'app.error_template', '_error.twig' );
 
 			Render::twigView(
 				$_errorTemplate,
 				array(
-					'base_path'         => \Kisma::get( 'app.base_path' ),
-					'app_root'          => \Kisma::get( 'app.root' ),
+					'base_path'         => Kisma::get( 'app.base_path' ),
+					'app_root'          => Kisma::get( 'app.root' ),
 					'page_title'        => 'Error',
 					'error'             => self::$_error,
 					'page_header'       => 'Something has gone awry...',
 					'page_header_small' => 'Not cool. :(',
 					'navbar'            => array(
-						'brand' => 'Kisma v' . \Kisma::KismaVersion,
+						'brand' => 'Kisma v' . Kisma::KismaVersion,
 						'items' => array(
 							array(
 								'title'  => 'Kisma on GitHub!',
@@ -216,7 +218,7 @@ class ErrorHandler
 	protected static function _cleanTrace( array &$trace, $skipLines = null, $basePath = null )
 	{
 		$_trace = array();
-		$_basePath = $basePath ? : \Kisma::get( 'app.base_path' );
+		$_basePath = $basePath ? : Kisma::get( 'app.base_path' );
 
 		//	Skip some lines
 		if ( !empty( $skipLines ) && count( $trace ) > $skipLines )

@@ -18,30 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Enums\Events;
-
-use Kisma\Core\Enums\SeedEnum;
+namespace Kisma\Core\Interfaces;
 
 /**
- * PublisherEvents
- * Events for publishers
+ * Something that looks like an event type (enum)
  */
-class PublisherEvents extends SeedEnum
+interface EventTypeLike
 {
 	//*************************************************************************
-	//* Constants
+	//	Constants
 	//*************************************************************************
 
 	/**
-	 * @var string
+	 * @const string The base event type
 	 */
-	const BEFORE_PUBLISH = 'kisma.core.publisher.before_publish';
-	/**
-	 * @var string
-	 */
-	const PROPAGATION_STOPPED = 'kisma.core.publisher.propagation_stopped';
-	/**
-	 * @var string
-	 */
-	const AFTER_PUBLISH = 'kisma.core.publisher.after_publish';
+	const __default = 'kisma.core.event';
 }

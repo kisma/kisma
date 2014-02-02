@@ -1,9 +1,6 @@
 <?php
 namespace Kisma\Core;
 
-use Kisma\Core\Utility\EventManager;
-use Kisma\Core\Utility\Log;
-
 require_once __DIR__ . '/SeedTest_Object.php';
 
 /**
@@ -40,32 +37,6 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 		$this->_object = new SeedTest_Object( array( 'tester' => $this ) );
 	}
 
-	protected function tearDown()
-	{
-		$this->_object = null;
-
-		foreach ( EventManager::getEventMap() as $_eventTag => $_subscribers )
-		{
-			Log::debug( 'Event "' . $_eventTag . '" listener dump:' );
-
-			foreach ( $_subscribers as $_listeners )
-			{
-				/** @var $_listener \Closure */
-				foreach ( $_listeners as $_subscriberId => $_closures )
-				{
-					foreach ( $_closures as $_closure )
-					{
-						Log::debug(
-							'-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) : gettype( $_closure ) )
-						);
-					}
-				}
-			}
-		}
-
-		Log::debug( 'Eventmap dump:' . json_encode( EventManager::getEventMap() ) );
-	}
-
 	/**
 	 * @covers Kisma\Core\Seed::__destruct
 	 */
@@ -73,7 +44,7 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->_destructorEventFired = 0;
 		$this->_object->__destruct();
-		$this->assertTrue( $this->_destructorEventFired > 0, 'Destructor event was not fired.' );
+		$this->assertEquals( 1, $this->_destructorEventFired, 'Destructor event was not fired.' );
 	}
 
 	/**
@@ -83,7 +54,7 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testOnAfterConstruct()
 	{
-		$this->assertTrue( false !== $this->_object->constructEvent );
+		$this->assertTrue( $this->_object->constructEvent );
 	}
 
 	/**
@@ -92,8 +63,8 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	public function testGetId()
 	{
 		$this->assertNotEmpty(
-			$_id = $this->_object->getId(),
-			'The object ID has not been set properly.'
+			 $_id = $this->_object->getId(),
+			 'The object ID has not been set properly.'
 		);
 	}
 
@@ -120,28 +91,6 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @covers Kisma\Core\Seed::setEventManager
-	 * @covers Kisma\Core\Seed::getEventManager
-	 */
-	public function testGetEventManager()
-	{
-		$this->assertTrue( is_string( $this->_object->getEventManager() ) );
-		$this->_object->setEventManager( false );
-		$this->assertTrue( false === $this->_object->getEventManager() );
-	}
-
-	/**
-	 * @covers Kisma\Core\Seed::getDiscoverEvents
-	 * @covers Kisma\Core\Seed::setDiscoverEvents
-	 */
-	public function testDiscoverEvents()
-	{
-		$this->assertTrue( $this->_object->getDiscoverEvents() );
-		$this->_object->setDiscoverEvents( false );
-		$this->assertTrue( false === $this->_object->getDiscoverEvents() );
-	}
-
-	/**
 	 * @covers Kisma\Core\Seed::on
 	 * @covers Kisma\Core\Seed::publish
 	 */
@@ -149,21 +98,20 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	{
 		$_eventFired = false;
 
-		//	Subscribe and publish to set flag
-		$this->_object->on(
-			'crazy.event',
-			function ( $event ) use ( &$_eventFired )
-			{
-				$_eventFired = true;
-			}
-		);
+		$_listener = function ( $event ) use ( &$_eventFired )
+		{
+			$_eventFired = true;
+		};
 
+		//	Subscribe and publish to set flag
+		$this->_object->on( 'crazy.event', $_listener );
 		$this->_object->publish( 'crazy.event' );
+
 		$this->assertTrue( $_eventFired );
 
 		//	Clear, unsub, and publish. Flag should not be set...
 		$_eventFired = false;
-		$this->_object->on( 'crazy.event', null );
+		$this->_object->off( 'crazy.event', $_listener );
 		$this->_object->publish( 'crazy.event' );
 
 		$this->assertTrue( false === $_eventFired );
