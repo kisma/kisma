@@ -1,5 +1,5 @@
 {
-	"name":        "kisma/kisma",
+	"name":        "kisma/kisma-dev",
 	"description": "PHP Utility Kernel",
 	"keywords":    [
 		"php", "php5", "library", "utility"
@@ -38,5 +38,10 @@
 			"Kisma\\": "src/"
 		},
 		"files": ["src/autoload.php"]
+	},
+	"extra":       {
+		"branch-alias": {
+			"dev-master": "0.3.x-dev"
+		}
 	}
 }
